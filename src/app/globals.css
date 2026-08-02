@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f7fa;
+  --foreground: #0a0a0a;
+
+  /* Brand palette */
+  --color-brand-purple: #6d28d9;
+  --color-brand-purple-bright: #7c3aed;
+  --color-brand-purple-light: #ede9fe;
+  --color-brand-purple-lightest: #f5f3ff;
+  --color-brand-black: #0a0a0a;
+  --color-brand-sidebar: #111111;
+  --color-brand-white: #ffffff;
+  --color-brand-bg: #f7f7fa;
+  --color-brand-border: #e5e7eb;
+  --color-brand-muted: #6b7280;
+  --color-brand-success: #16a34a;
+  --color-brand-warning: #f59e0b;
+  --color-brand-danger: #dc2626;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-brand-purple: var(--color-brand-purple);
+  --color-brand-purple-bright: var(--color-brand-purple-bright);
+  --color-brand-purple-light: var(--color-brand-purple-light);
+  --color-brand-purple-lightest: var(--color-brand-purple-lightest);
+  --color-brand-black: var(--color-brand-black);
+  --color-brand-sidebar: var(--color-brand-sidebar);
+  --color-brand-white: var(--color-brand-white);
+  --color-brand-bg: var(--color-brand-bg);
+  --color-brand-border: var(--color-brand-border);
+  --color-brand-muted: var(--color-brand-muted);
+  --color-brand-success: var(--color-brand-success);
+  --color-brand-warning: var(--color-brand-warning);
+  --color-brand-danger: var(--color-brand-danger);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-poppins);
+
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  --shadow-card-lg: 0 4px 12px -2px rgb(17 17 17 / 0.08), 0 2px 4px -2px rgb(17 17 17 / 0.04);
+  --shadow-glow-purple: 0 8px 30px -8px rgb(109 40 217 / 0.35);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+  }
+
+  .bg-grid-purple {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgb(109 40 217 / 0.12) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+}
