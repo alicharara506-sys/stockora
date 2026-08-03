@@ -15,7 +15,7 @@ export function Topbar({
   userName: string;
 }) {
   return (
-    <header className="flex h-16 items-center justify-between border-b border-brand-border bg-white px-4 sm:px-6">
+    <header className="flex h-16 items-center justify-between border-b border-brand-border bg-white px-4 print:hidden sm:px-6">
       <div className="flex items-center gap-3">
         <MobileSidebar />
         <div className="flex items-center gap-2 rounded-xl border border-brand-border px-3 py-1.5 text-sm">

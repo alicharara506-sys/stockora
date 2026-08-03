@@ -34,6 +34,7 @@ model User {
   aiUsages         AIUsage[]
   notifications    Notification[]
   passwordResets   PasswordResetToken[]
+  salesAsEmployee  Sale[]
 }
 
 model Account {
@@ -914,6 +915,7 @@ model Sale {
   branch          Branch           @relation(fields: [branchId], references: [id])
   registerSession RegisterSession? @relation(fields: [registerSessionId], references: [id])
   customer        Customer?        @relation(fields: [customerId], references: [id])
+  employee        User             @relation(fields: [employeeId], references: [id])
 
   items     SaleItem[]
   payments  Payment[]

@@ -10,7 +10,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col bg-brand-sidebar lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col bg-brand-sidebar print:hidden lg:flex">
       <div className="flex h-16 items-center px-6">
         <Link href="/dashboard">
           <Logo dark markClassName="size-8" />
