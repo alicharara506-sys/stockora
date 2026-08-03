@@ -6,15 +6,18 @@ import { ProductGrid } from "@/components/pos/product-grid";
 import { CartPanel } from "@/components/pos/cart-panel";
 import { CheckoutDialog } from "@/components/pos/checkout-dialog";
 import { CloseRegisterDialog } from "@/components/pos/close-register-dialog";
+import type { PosCustomer } from "@/components/pos/customer-picker";
 import type { CartLine, PosVariant } from "@/components/pos/types";
 
 export function PosClient({
   variants,
+  customers,
   registerSessionId,
   branchId,
   openingCash,
 }: {
   variants: PosVariant[];
+  customers: PosCustomer[];
   registerSessionId: string;
   branchId: string;
   openingCash: number;
@@ -23,6 +26,7 @@ export function PosClient({
   const [lines, setLines] = useState<CartLine[]>([]);
   const [discountTotal, setDiscountTotal] = useState("0");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
   function addVariant(variant: PosVariant) {
     setLines((prev) => {
@@ -65,6 +69,7 @@ export function PosClient({
     setLines([]);
     setDiscountTotal("0");
     setCheckoutOpen(false);
+    setCustomerId(null);
     router.push(`/sales/${saleId}`);
   }
 
@@ -90,6 +95,9 @@ export function PosClient({
             onQuantityChange={updateQuantity}
             onRemove={removeLine}
             onCharge={() => setCheckoutOpen(true)}
+            customers={customers}
+            selectedCustomerId={customerId}
+            onSelectCustomer={setCustomerId}
           />
         </div>
       </div>
@@ -101,6 +109,7 @@ export function PosClient({
         discountTotal={Math.min(Number(discountTotal) || 0, lines.reduce((s, l) => s + l.unitPrice * l.quantity, 0))}
         registerSessionId={registerSessionId}
         branchId={branchId}
+        customerId={customerId}
         onSuccess={onSaleComplete}
       />
     </div>

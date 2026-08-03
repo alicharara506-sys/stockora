@@ -36,6 +36,13 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
     return { success: false, error: "This branch has no stock location configured." };
   }
 
+  const customer = data.customerId
+    ? await prisma.customer.findFirst({ where: { id: data.customerId, businessId: context.business.id } })
+    : null;
+  if (data.customerId && !customer) {
+    return { success: false, error: "Customer not found." };
+  }
+
   const variants = await prisma.productVariant.findMany({
     where: { id: { in: data.items.map((i) => i.variantId) }, businessId: context.business.id },
   });
@@ -43,6 +50,13 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
 
   const subtotal = data.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const total = Math.max(0, subtotal - data.discountTotal);
+
+  if (data.paymentMethod === "STORE_CREDIT") {
+    if (!customer) return { success: false, error: "Select a customer to pay with store credit." };
+    if (Number(customer.storeCreditBalance) < total) {
+      return { success: false, error: "Customer doesn't have enough store credit." };
+    }
+  }
 
   try {
     const saleId = await prisma.$transaction(async (tx) => {
@@ -55,6 +69,7 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
           registerSessionId: session.id,
           saleNumber,
           employeeId: context.userId,
+          customerId: customer?.id,
           currency: context.business.baseCurrency,
           subtotal,
           discountTotal: data.discountTotal,
@@ -112,12 +127,52 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
         });
       }
 
+      if (customer) {
+        const loyaltyEarned = Math.floor(total);
+
+        if (data.paymentMethod === "STORE_CREDIT") {
+          await tx.customerCreditTransaction.create({
+            data: {
+              customerId: customer.id,
+              type: "REDEEM",
+              amount: total,
+              referenceType: "Sale",
+              referenceId: sale.id,
+            },
+          });
+        }
+
+        if (loyaltyEarned > 0) {
+          await tx.loyaltyTransaction.create({
+            data: {
+              customerId: customer.id,
+              type: "EARN",
+              points: loyaltyEarned,
+              referenceType: "Sale",
+              referenceId: sale.id,
+            },
+          });
+        }
+
+        await tx.customer.update({
+          where: { id: customer.id },
+          data: {
+            totalSpent: { increment: total },
+            lastPurchaseAt: new Date(),
+            storeCreditBalance:
+              data.paymentMethod === "STORE_CREDIT" ? { decrement: total } : undefined,
+            loyaltyBalance: loyaltyEarned > 0 ? { increment: loyaltyEarned } : undefined,
+          },
+        });
+      }
+
       return sale.id;
     });
 
     revalidatePath("/pos");
     revalidatePath("/sales");
     revalidatePath("/inventory");
+    revalidatePath("/customers");
     return { success: true, saleId };
   } catch (error) {
     if (error instanceof InsufficientStockError) {

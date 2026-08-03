@@ -15,6 +15,7 @@ const METHODS = [
   { key: "MOBILE_WALLET", label: "Mobile Wallet" },
   { key: "BANK_TRANSFER", label: "Bank Transfer" },
   { key: "QR_PAY", label: "QR Pay" },
+  { key: "STORE_CREDIT", label: "Store Credit" },
 ] as const;
 
 export function CheckoutDialog({
@@ -24,6 +25,7 @@ export function CheckoutDialog({
   discountTotal,
   registerSessionId,
   branchId,
+  customerId,
   onSuccess,
 }: {
   open: boolean;
@@ -32,6 +34,7 @@ export function CheckoutDialog({
   discountTotal: number;
   registerSessionId: string;
   branchId: string;
+  customerId: string | null;
   onSuccess: (saleId: string) => void;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -49,6 +52,7 @@ export function CheckoutDialog({
       const result = await checkoutAction({
         registerSessionId,
         branchId,
+        customerId: customerId ?? undefined,
         items: lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity, unitPrice: l.unitPrice })),
         discountTotal,
         paymentMethod: method,
@@ -95,20 +99,25 @@ export function CheckoutDialog({
             <div>
               <Label>Payment method</Label>
               <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-                {METHODS.map((m) => (
-                  <button
-                    key={m.key}
-                    type="button"
-                    onClick={() => setMethod(m.key)}
-                    className={
-                      method === m.key
-                        ? "rounded-xl bg-brand-purple px-3 py-2 text-xs font-medium text-white"
-                        : "rounded-xl border border-brand-border px-3 py-2 text-xs font-medium text-brand-black hover:bg-brand-purple-lightest"
-                    }
-                  >
-                    {m.label}
-                  </button>
-                ))}
+                {METHODS.map((m) => {
+                  const disabled = m.key === "STORE_CREDIT" && !customerId;
+                  return (
+                    <button
+                      key={m.key}
+                      type="button"
+                      onClick={() => setMethod(m.key)}
+                      disabled={disabled}
+                      title={disabled ? "Select a customer to pay with store credit" : undefined}
+                      className={
+                        method === m.key
+                          ? "rounded-xl bg-brand-purple px-3 py-2 text-xs font-medium text-white"
+                          : "rounded-xl border border-brand-border px-3 py-2 text-xs font-medium text-brand-black hover:bg-brand-purple-lightest disabled:cursor-not-allowed disabled:opacity-40"
+                      }
+                    >
+                      {m.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

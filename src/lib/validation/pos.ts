@@ -19,6 +19,7 @@ export const checkoutItemSchema = z.object({
 export const checkoutSchema = z.object({
   registerSessionId: z.string().min(1),
   branchId: z.string().min(1),
+  customerId: z.string().optional().or(z.literal("")),
   items: z.array(checkoutItemSchema).min(1, "Add at least one item"),
   discountTotal: z.number().min(0).default(0),
   paymentMethod: z.enum(paymentMethodValues),

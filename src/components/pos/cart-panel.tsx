@@ -3,6 +3,7 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CustomerPicker, type PosCustomer } from "@/components/pos/customer-picker";
 import type { CartLine } from "@/components/pos/types";
 
 export function CartPanel({
@@ -12,6 +13,9 @@ export function CartPanel({
   onQuantityChange,
   onRemove,
   onCharge,
+  customers,
+  selectedCustomerId,
+  onSelectCustomer,
 }: {
   lines: CartLine[];
   discountTotal: string;
@@ -19,6 +23,9 @@ export function CartPanel({
   onQuantityChange: (variantId: string, quantity: number) => void;
   onRemove: (variantId: string) => void;
   onCharge: () => void;
+  customers: PosCustomer[];
+  selectedCustomerId: string | null;
+  onSelectCustomer: (id: string | null) => void;
 }) {
   const subtotal = lines.reduce((sum, l) => sum + l.unitPrice * l.quantity, 0);
   const discount = Math.min(Number(discountTotal) || 0, subtotal);
@@ -26,8 +33,9 @@ export function CartPanel({
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-brand-border bg-white">
-      <div className="border-b border-brand-border p-4">
+      <div className="flex items-center justify-between border-b border-brand-border p-4">
         <h2 className="font-display text-base font-semibold text-brand-black">Cart</h2>
+        <CustomerPicker customers={customers} selectedId={selectedCustomerId} onSelect={onSelectCustomer} />
       </div>
 
       <div className="flex-1 space-y-2 overflow-y-auto p-4">

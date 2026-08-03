@@ -55,9 +55,17 @@ export default async function PosPage() {
       stock: b.quantityOnHand,
     }));
 
+  const customers = await prisma.customer.findMany({
+    where: { businessId: context.business.id },
+    select: { id: true, name: true, phone: true },
+    orderBy: { name: "asc" },
+    take: 200,
+  });
+
   return (
     <PosClient
       variants={variants}
+      customers={customers}
       registerSessionId={session.id}
       branchId={register.branchId}
       openingCash={Number(session.openingCash)}
