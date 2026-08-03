@@ -2,18 +2,26 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ACTIVE_BUSINESS_COOKIE } from "@/lib/tenancy";
 import { ensureSystemRolesSeeded } from "@/lib/permissions/seed";
 import { ensurePlansSeeded } from "@/lib/plans";
-import { SYSTEM_ROLES } from "@/lib/permissions/constants";
+import { SYSTEM_ROLES, PERMISSIONS } from "@/lib/permissions/constants";
+import { createBranchForBusiness } from "@/server/services/branches";
+import { requirePermission } from "@/lib/tenancy";
 
 const createBusinessSchema = z.object({
   name: z.string().min(2, "Enter your business name").max(120),
   industry: z.string().min(1, "Choose an industry"),
   baseCurrency: z.string().min(3).max(3),
+});
+
+const updateProfileSchema = z.object({
+  name: z.string().min(2, "Enter your business name").max(120),
+  industry: z.string().min(1, "Choose an industry"),
 });
 
 const TRIAL_LENGTH_MS = 1000 * 60 * 60 * 24 * 14;
@@ -47,13 +55,11 @@ export async function createBusinessAction(input: unknown): Promise<ActionResult
 
     await tx.businessSetting.create({ data: { businessId: business.id } });
 
-    await tx.branch.create({
-      data: {
-        businessId: business.id,
-        name: "Main Branch",
-        code: "MAIN",
-        isMainBranch: true,
-      },
+    await createBranchForBusiness(tx, {
+      businessId: business.id,
+      name: "Main Branch",
+      code: "MAIN",
+      isMainBranch: true,
     });
 
     return business.id;
@@ -93,6 +99,24 @@ export async function createBusinessAction(input: unknown): Promise<ActionResult
   });
 
   redirect("/dashboard");
+}
+
+export async function updateBusinessProfileAction(input: unknown): Promise<ActionResult> {
+  const context = await requirePermission(PERMISSIONS.CHANGE_SETTINGS);
+
+  const parsed = updateProfileSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  await prisma.business.update({
+    where: { id: context.business.id },
+    data: { name: parsed.data.name, industry: parsed.data.industry },
+  });
+
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
+  return { success: true };
 }
 
 async function uniqueSlug(name: string) {
