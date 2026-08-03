@@ -64,13 +64,24 @@ async function main() {
     update: {},
   });
 
-  await prisma.branch.upsert({
+  const branchMall = await prisma.branch.upsert({
     where: { businessId_code: { businessId: business.id, code: "MALL" } },
     create: {
       businessId: business.id,
       name: "Beirut Mall Branch",
       code: "MALL",
       address: "Beirut City Mall, Dora",
+    },
+    update: {},
+  });
+
+  await prisma.inventoryLocation.upsert({
+    where: { branchId: branchMall.id },
+    create: {
+      businessId: business.id,
+      type: "BRANCH",
+      branchId: branchMall.id,
+      name: branchMall.name,
     },
     update: {},
   });
@@ -141,6 +152,11 @@ async function main() {
   ];
 
   for (const productSeed of products) {
+    const existingProduct = await prisma.product.findFirst({
+      where: { businessId: business.id, name: productSeed.name },
+    });
+    if (existingProduct) continue;
+
     const category = categories.find((c) => c.name === productSeed.category);
     const product = await prisma.product.create({
       data: {

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/tenancy";
 import { PERMISSIONS } from "@/lib/permissions/constants";
 import { createProductSchema, updateProductSchema } from "@/lib/validation/products";
+import { applyInventoryMovement } from "@/server/services/inventory";
 
 export type ActionResult = { success: true } | { success: false; error: string };
 
@@ -91,26 +92,14 @@ export async function createProductAction(input: unknown): Promise<ActionResult>
       });
 
       if (mainLocation && variant.openingQuantity > 0) {
-        await tx.inventoryBalance.create({
-          data: {
-            businessId: context.business.id,
-            locationId: mainLocation.id,
-            variantId: createdVariant.id,
-            quantityOnHand: variant.openingQuantity,
-          },
-        });
-        await tx.inventoryMovement.create({
-          data: {
-            businessId: context.business.id,
-            locationId: mainLocation.id,
-            variantId: createdVariant.id,
-            type: "OPENING",
-            quantity: variant.openingQuantity,
-            previousQuantity: 0,
-            newQuantity: variant.openingQuantity,
-            userId: context.userId,
-            notes: "Opening stock at product creation",
-          },
+        await applyInventoryMovement(tx, {
+          businessId: context.business.id,
+          locationId: mainLocation.id,
+          variantId: createdVariant.id,
+          type: "OPENING",
+          quantity: variant.openingQuantity,
+          userId: context.userId,
+          notes: "Opening stock at product creation",
         });
       }
     }
