@@ -13,6 +13,7 @@ import { SYSTEM_ROLES, PERMISSIONS } from "@/lib/permissions/constants";
 import { createBranchForBusiness } from "@/server/services/branches";
 import { requirePermission } from "@/lib/tenancy";
 import { ensureBaseAttributesSeeded } from "@/lib/catalog/seed";
+import { logAudit } from "@/lib/audit";
 
 const createBusinessSchema = z.object({
   name: z.string().min(2, "Enter your business name").max(120),
@@ -114,6 +115,16 @@ export async function updateBusinessProfileAction(input: unknown): Promise<Actio
   await prisma.business.update({
     where: { id: context.business.id },
     data: { name: parsed.data.name, industry: parsed.data.industry },
+  });
+
+  await logAudit({
+    businessId: context.business.id,
+    userId: context.userId,
+    action: "business.update_profile",
+    entityType: "Business",
+    entityId: context.business.id,
+    before: { name: context.business.name, industry: context.business.industry },
+    after: { name: parsed.data.name, industry: parsed.data.industry },
   });
 
   revalidatePath("/settings");

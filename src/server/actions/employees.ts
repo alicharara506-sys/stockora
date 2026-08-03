@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/tenancy";
 import { PERMISSIONS, SYSTEM_ROLES } from "@/lib/permissions/constants";
 import { sendEmail } from "@/lib/email";
+import { logAudit } from "@/lib/audit";
 
 const INVITATION_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
@@ -95,6 +96,16 @@ export async function updateMemberRoleAction(
   await prisma.businessMembership.update({
     where: { id: membershipId },
     data: { roleId: role.id },
+  });
+
+  await logAudit({
+    businessId: context.business.id,
+    userId: context.userId,
+    action: "membership.update_role",
+    entityType: "BusinessMembership",
+    entityId: membershipId,
+    before: { roleName: membership.role.name },
+    after: { roleName: role.name },
   });
 
   revalidatePath("/employees");

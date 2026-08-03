@@ -3,10 +3,12 @@
 import crypto from "node:crypto";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { sendEmail } from "@/lib/email";
+import { checkRateLimit } from "@/lib/rate-limit";
 import {
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -132,6 +134,14 @@ function appUrl() {
 
 export async function authenticateAction(formData: FormData) {
   const callbackUrl = (formData.get("callbackUrl") as string) || "/dashboard";
+  const email = String(formData.get("email") ?? "").toLowerCase();
+
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const { allowed } = checkRateLimit(`login:${ip}:${email}`, 8, 15 * 60 * 1000);
+  if (!allowed) {
+    redirect(`/login?error=RateLimited&callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  }
+
   try {
     await signIn("credentials", {
       email: formData.get("email"),

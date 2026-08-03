@@ -66,4 +66,6 @@ required; everything else (Google login, transactional email) degrades gracefull
 
 Any Next.js-compatible host (Vercel, etc.) works. You'll need a managed PostgreSQL instance and
 the environment variables above configured in the hosting provider, then run
-`npx prisma migrate deploy` as part of your release step before starting the app.
+`npx prisma migrate deploy` as part of your release step before starting the app. See
+[`DEPLOYMENT.md`](./DEPLOYMENT.md) for the full release checklist (env vars, migration step,
+production hardening notes).

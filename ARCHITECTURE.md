@@ -68,7 +68,10 @@ Business logic for modules that aren't built yet (POS, inventory, sales, ...) wi
 ## 3. Database entities & relationships
 
 `prisma/schema.prisma` is the full model — it already contains every entity requested up front
-(56 models) so later phases only add logic, not schema churn:
+(56 models) so later phases only add logic, not schema churn. The one exception is `ApiKey`
+(added in Phase 10 for the `/integrations` API-access feature, which wasn't in the original
+spec) — a reminder that "no schema churn" is a design goal, not an absolute guarantee, when a
+phase surfaces a genuine gap:
 
 - **Identity/Auth**: `User`, `Account`, `Session`, `VerificationToken`, `PasswordResetToken`
   (Auth.js-compatible plus a custom reset-token table).
@@ -93,6 +96,8 @@ Business logic for modules that aren't built yet (POS, inventory, sales, ...) wi
 - **QR**: `QRCode` (signed random `token`, never a raw sequential ID), `QRScan`.
 - **AI**: `AIConversation`, `AIMessage`, `AIUsage` (per business/user/month, for plan limits).
 - **Billing**: `Plan`, `Subscription`, `Invoice`.
+- **API access**: `ApiKey` (bcrypt-hashed, business-scoped, powers the versioned `/api/v1` REST
+  surface for e-commerce/integration use — added Phase 10).
 - **Currency**: `ExchangeRate` (append-only history; historical sales keep the rate captured at
   `Sale.exchangeRate` and are never recalculated).
 - **Ops**: `Notification`, `AuditLog`, `BusinessSetting`.
@@ -155,28 +160,35 @@ uniqueness (e.g. a SKU unique per business, not globally) is enforced with compo
 - Stock-affecting operations (checkout, returns, transfers, counts) are expected to run inside a
   single `prisma.$transaction` so a failed checkout can't partially decrement stock.
 
-## 8. AI-assistant architecture (planned — Phase 9)
+## 8. AI-assistant architecture (implemented — Phase 9)
 
-- A provider-agnostic interface so the assistant can run on Anthropic or OpenAI without touching
-  call sites; the actual model call happens server-side only (never expose a provider API key to
-  the browser).
+- A provider-agnostic interface (`src/lib/ai/provider.ts`) so the assistant can run on Anthropic
+  or another provider without touching call sites; the actual model call happens server-side
+  only (never expose a provider API key to the browser). Without `ANTHROPIC_API_KEY` set, it
+  degrades to an explanatory message instead of erroring, mirroring the email-provider fallback.
 - The model gets a fixed set of **approved analytics tools** (`getSalesSummary`,
   `getTopProducts`, `getLowStockVariants`, `getProfitSummary`, `comparePeriods`,
   `getBranchPerformance`, `getSlowMovingStock`, `getCustomerSummary`, `getReturnSummary`,
-  `getSuggestedReorders`) backed by parameterized Prisma queries — never arbitrary SQL.
-- Every tool call is scoped to `requireBusinessContext()` and checks the caller's permissions
-  (e.g. a Cashier without `view_profit` gets a permission-denied tool result, not profit numbers).
-  `AIUsage` tracks messages/tokens per business/user/month against the active `Plan.aiMessageLimit`.
+  `getSuggestedReorders`) backed by parameterized Prisma queries — never arbitrary SQL
+  (`src/lib/ai/tools.ts`).
+- Every tool call is scoped to the caller's resolved business/permission set and checks
+  permissions before running (e.g. a Cashier without `view_profit` gets a permission-denied tool
+  result, not profit numbers). `AIUsage` tracks messages/tokens per business/user/month against
+  the active `Plan.aiMessageLimit` (`src/lib/ai/usage.ts`); a message that only gets the
+  "not connected" fallback doesn't count against the limit.
 
-## 9. QR-code security architecture (planned — Phase 10)
+## 9. QR-code security architecture (implemented — Phase 10)
 
-- `QRCode.token` is a signed/random public identifier, generated server-side — never a raw,
-  sequential database ID is encoded into a QR payload.
+- `QRCode.token` is a signed/random public identifier, generated server-side (`src/lib/qr.ts`) —
+  never a raw, sequential database ID is encoded into a QR payload.
 - Each code has a `type` (payment/product/receipt/loyalty/store/inventory), optional `expiresAt`,
   and a `status` (active/expired/revoked) that's checked on every scan; `QRScan` records scan
-  attempts (including failed ones) for auditability.
-- PNG/SVG generation happens server-side via the `qrcode` package (already wired into the
-  marketing "Scan to Pay" section as a real, generated QR code, not a static image).
+  attempts (including failed ones, with a hashed IP) for auditability. The public scan route
+  (`/qr/[token]`, outside the authenticated app group) resolves and logs every attempt through
+  `resolveAndLogScan()` before rendering type-specific content.
+- PNG/SVG generation happens server-side via the `qrcode` package (wired into the marketing
+  "Scan to Pay" section, the receipt page, and the `/qr-codes` management page — all real,
+  generated codes, never static images).
 
 ## 10. Frontend page map
 
@@ -202,17 +214,24 @@ dead/broken navigation while the rest of the build ships.
 
 ## 11. Implementation phases
 
-1. **Project init, design system, database, auth, multi-tenancy, marketing site** — *done, this
-   PR*.
-2. Business onboarding (full multi-step wizard), branches, users, roles & permissions UI.
-3. Products, categories, brands, variants, barcodes, product images.
-4. Inventory, inventory ledger UI, stock adjustments/transfers.
-5. POS, payments, receipts, register sessions.
-6. Customers, returns, exchanges, store credit, loyalty.
-7. Suppliers, purchases, expenses.
-8. Reports, dashboard analytics.
-9. AI assistant + analytics tool layer.
-10. QR system, subscription billing, integrations, hardening, deployment docs.
+1. **Project init, design system, database, auth, multi-tenancy, marketing site** — *done*.
+2. **Business onboarding, branches, users, roles & permissions UI** — *done*.
+3. **Products, categories, brands, variants, barcodes, product images** — *done*.
+4. **Inventory, inventory ledger UI, stock adjustments/transfers** — *done*.
+5. **POS, payments, receipts, register sessions** — *done*.
+6. **Customers, returns, exchanges, store credit, loyalty** — *done*.
+7. **Suppliers, purchases, expenses** — *done*.
+8. **Reports, dashboard analytics** — *done*.
+9. **AI assistant + analytics tool layer** — *done*.
+10. **QR system, subscription billing, integrations, hardening, deployment docs** — *done*.
+    Billing runs in "manual" mode (no live payment provider — see `DEPLOYMENT.md`); the QR, AI,
+    and integrations systems are real and fully wired against the seeded demo data.
+
+All ten phases of the original build plan are complete. Natural next steps beyond the original
+scope: a real payment-provider integration (Stripe) behind the existing `Subscription`/`Invoice`
+schema, a distributed rate limiter for multi-instance deployments, and an automated test suite
+(the build has been verified phase-by-phase via `tsc`/`eslint`/`next build` plus live Playwright
+runs against a seeded database, but there's no CI-enforced regression suite yet).
 
 ## 12. Environment variables
 
@@ -224,6 +243,10 @@ See `.env.example`:
 - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — optional; Google login only appears when both are set.
 - `RESEND_API_KEY` / `EMAIL_FROM` — optional; without a key, auth emails are logged to the server
   console instead of sent, so the flows stay testable without an email provider.
+- `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` — optional; without a key, the AI assistant chat still
+  works (conversations persist) but replies that it isn't connected yet.
+
+See `DEPLOYMENT.md` for the full production release checklist.
 
 ## Notes on the toolchain (Next.js 16 / Prisma 7)
 

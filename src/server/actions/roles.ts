@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/tenancy";
 import { PERMISSIONS, PERMISSION_DEFINITIONS } from "@/lib/permissions/constants";
+import { logAudit } from "@/lib/audit";
 
 const VALID_PERMISSION_KEYS = new Set<string>(PERMISSION_DEFINITIONS.map((p) => p.key));
 
@@ -28,7 +29,7 @@ export async function createCustomRoleAction(input: unknown): Promise<ActionResu
 
   const permissions = await prisma.permission.findMany({ where: { key: { in: permissionKeys } } });
 
-  await prisma.role.create({
+  const role = await prisma.role.create({
     data: {
       businessId: context.business.id,
       key,
@@ -38,6 +39,15 @@ export async function createCustomRoleAction(input: unknown): Promise<ActionResu
         create: permissions.map((permission) => ({ permissionId: permission.id })),
       },
     },
+  });
+
+  await logAudit({
+    businessId: context.business.id,
+    userId: context.userId,
+    action: "role.create",
+    entityType: "Role",
+    entityId: role.id,
+    after: { name: role.name, permissionKeys },
   });
 
   revalidatePath("/settings");
@@ -52,6 +62,7 @@ export async function updateRolePermissionsAction(
 
   const role = await prisma.role.findFirst({
     where: { id: roleId, businessId: context.business.id },
+    include: { permissions: { include: { permission: true } } },
   });
   if (!role) {
     return { success: false, error: "Role not found." };
@@ -60,6 +71,7 @@ export async function updateRolePermissionsAction(
     return { success: false, error: "System roles can't be edited." };
   }
 
+  const beforeKeys = role.permissions.map((rp) => rp.permission.key);
   const validKeys = permissionKeys.filter((key) => VALID_PERMISSION_KEYS.has(key));
   const permissions = await prisma.permission.findMany({ where: { key: { in: validKeys } } });
 
@@ -69,6 +81,16 @@ export async function updateRolePermissionsAction(
       data: permissions.map((permission) => ({ roleId, permissionId: permission.id })),
     }),
   ]);
+
+  await logAudit({
+    businessId: context.business.id,
+    userId: context.userId,
+    action: "role.update_permissions",
+    entityType: "Role",
+    entityId: role.id,
+    before: { permissionKeys: beforeKeys },
+    after: { permissionKeys: validKeys },
+  });
 
   revalidatePath("/settings");
   return { success: true };

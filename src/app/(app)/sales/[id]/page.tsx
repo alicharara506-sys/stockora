@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import QRCode from "qrcode";
 import { requireBusinessContext } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
+import { createQrCode, qrTargetUrl, renderQrSvg } from "@/lib/qr";
 import { Logo } from "@/components/ui/logo";
 import { PrintButton } from "@/components/pos/print-button";
 
@@ -34,13 +34,23 @@ export default async function SaleReceiptPage({
 
   if (!sale) notFound();
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const qrSvg = await QRCode.toString(`${appUrl}/sales/${sale.id}`, {
-    type: "svg",
-    errorCorrectionLevel: "H",
-    margin: 2,
-    color: { dark: "#0A0A0A", light: "#FFFFFF" },
+  let receiptQr = await prisma.qRCode.findFirst({
+    where: { saleId: sale.id, type: "RECEIPT", status: "ACTIVE" },
   });
+  if (!receiptQr) {
+    receiptQr = await createQrCode({
+      businessId: context.business.id,
+      type: "RECEIPT",
+      saleId: sale.id,
+      payload: {
+        saleNumber: sale.saleNumber,
+        total: Number(sale.total),
+        currency: sale.currency,
+        date: sale.createdAt.toISOString(),
+      },
+    });
+  }
+  const qrSvg = await renderQrSvg(qrTargetUrl(receiptQr.token));
 
   return (
     <div className="mx-auto max-w-md space-y-4">

@@ -153,6 +153,7 @@ model Business {
   setting            BusinessSetting?
   exchangeRates      ExchangeRate[]
   invitations        Invitation[]
+  apiKeys            ApiKey[]
 
   @@index([status])
 }
@@ -1451,6 +1452,28 @@ model ExchangeRate {
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId, fromCurrency, toCurrency, effectiveAt])
+}
+
+// ---------------------------------------------------------------------------
+// API access
+// ---------------------------------------------------------------------------
+
+// Only a bcrypt hash of the key is ever stored — the plaintext is shown to the
+// user once, at creation time, and cannot be retrieved again.
+model ApiKey {
+  id          String    @id @default(cuid())
+  businessId  String
+  name        String
+  keyPrefix   String
+  hashedKey   String
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
 }
 
 // ---------------------------------------------------------------------------

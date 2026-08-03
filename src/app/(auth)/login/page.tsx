@@ -20,7 +20,9 @@ export default async function LoginPage({
 
       {error && (
         <p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-brand-danger">
-          Invalid email or password. Please try again.
+          {error === "RateLimited"
+            ? "Too many sign-in attempts. Please wait a few minutes and try again."
+            : "Invalid email or password. Please try again."}
         </p>
       )}
 
