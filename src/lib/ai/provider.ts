@@ -113,14 +113,110 @@ class AnthropicProvider implements AIProvider {
   }
 }
 
+interface GroqToolCall {
+  id: string;
+  function: { name: string; arguments: string };
+}
+
+interface GroqMessage {
+  role: string;
+  content: string | null;
+  tool_calls?: GroqToolCall[];
+  tool_call_id?: string;
+}
+
+/**
+ * Groq's Chat Completions API is OpenAI-compatible (function-calling shape,
+ * not Anthropic's tool_use blocks) and has a genuinely free tier — no
+ * payment method required. Implemented with plain `fetch` so enabling it
+ * never requires an `npm install`.
+ */
+class GroqProvider implements AIProvider {
+  readonly isConfigured = true;
+
+  constructor(
+    private apiKey: string,
+    private model: string,
+  ) {}
+
+  async runTurn(params: {
+    systemPrompt: string;
+    history: AIHistoryMessage[];
+    tools: AIToolSpec[];
+    executeTool: (name: string, input: unknown) => Promise<unknown>;
+  }): Promise<AITurnResult> {
+    const toolCalls: AIToolCallLog[] = [];
+    let totalTokens = 0;
+
+    const messages: GroqMessage[] = [
+      { role: "system", content: params.systemPrompt },
+      ...params.history.map((m) => ({ role: m.role, content: m.content })),
+    ];
+
+    const tools = params.tools.map((t) => ({
+      type: "function",
+      function: { name: t.name, description: t.description, parameters: t.inputSchema },
+    }));
+
+    for (let iteration = 0; iteration < MAX_TOOL_ITERATIONS; iteration++) {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({ model: this.model, messages, tools, max_tokens: 1024 }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        return {
+          text: `The AI provider returned an error (${response.status}): ${errText.slice(0, 300)}`,
+          toolCalls,
+          totalTokens,
+        };
+      }
+
+      const data = await response.json();
+      totalTokens += data.usage?.total_tokens ?? 0;
+      const message: GroqMessage = data.choices[0].message;
+
+      if (!message.tool_calls || message.tool_calls.length === 0) {
+        return { text: message.content?.trim() || "I don't have a response for that.", toolCalls, totalTokens };
+      }
+
+      messages.push(message);
+
+      for (const call of message.tool_calls) {
+        let input: unknown = {};
+        try {
+          input = JSON.parse(call.function.arguments || "{}");
+        } catch {
+          // Malformed tool-call arguments from the model — treat as empty input
+          // and let runTool()'s own schema validation report the real problem.
+        }
+        const result = await params.executeTool(call.function.name, input);
+        toolCalls.push({ toolName: call.function.name, input, result });
+        messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify(result) });
+      }
+    }
+
+    return {
+      text: "I looked into this using several tools but couldn't finish in time — try narrowing your question.",
+      toolCalls,
+      totalTokens,
+    };
+  }
+}
+
 class UnconfiguredProvider implements AIProvider {
   readonly isConfigured = false;
 
   async runTurn(): Promise<AITurnResult> {
     return {
       text:
-        "The AI assistant isn't connected yet. Ask your workspace owner to add an ANTHROPIC_API_KEY " +
-        "to enable it — until then, the Reports page covers the same analytics.",
+        "The AI assistant isn't connected yet. Add a free GROQ_API_KEY (or a paid ANTHROPIC_API_KEY) " +
+        "to your .env file to enable it — until then, the Reports page covers the same analytics.",
       toolCalls: [],
       totalTokens: 0,
     };
@@ -131,7 +227,15 @@ let cachedProvider: AIProvider | undefined;
 
 export function getAIProvider(): AIProvider {
   if (cachedProvider) return cachedProvider;
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  cachedProvider = apiKey ? new AnthropicProvider(apiKey) : new UnconfiguredProvider();
+  const groqKey = process.env.GROQ_API_KEY;
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+
+  if (groqKey) {
+    cachedProvider = new GroqProvider(groqKey, process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile");
+  } else if (anthropicKey) {
+    cachedProvider = new AnthropicProvider(anthropicKey);
+  } else {
+    cachedProvider = new UnconfiguredProvider();
+  }
   return cachedProvider;
 }
