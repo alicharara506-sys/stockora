@@ -9,7 +9,11 @@ import { InlineCreatableSelect } from "@/components/products/inline-creatable-se
 import { VariantGenerator } from "@/components/products/variant-generator";
 import type { AttributeOption, GeneratedVariantRow } from "@/components/products/variant-utils";
 import { createProductAction } from "@/server/actions/products";
-import { createCategoryAction, createBrandAction } from "@/server/actions/catalog";
+import {
+  createCategoryAction,
+  createBrandAction,
+  syncCategorySizeChartAction,
+} from "@/server/actions/catalog";
 
 const GENDERS = ["UNISEX", "MEN", "WOMEN", "BOYS", "GIRLS"] as const;
 const AGE_GROUPS = ["ADULT", "KIDS", "BABY", "TODDLER"] as const;
@@ -20,12 +24,16 @@ export function ProductForm({
   brands,
   attributes,
 }: {
-  categories: { id: string; name: string }[];
+  categories: { id: string; name: string; sizeChartId: string | null }[];
   brands: { id: string; name: string }[];
   attributes: AttributeOption[];
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [attributeOptions, setAttributeOptions] = useState<AttributeOption[]>(attributes);
+  const [presetSelection, setPresetSelection] = useState<{ attributeId: string; valueIds: string[] } | null>(null);
+  const [isSyncingSizes, startSizeSync] = useTransition();
+  const [sizeSyncError, setSizeSyncError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -121,13 +129,40 @@ export function ProductForm({
               className="w-full rounded-xl border border-brand-border px-4 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
             />
           </div>
-          <InlineCreatableSelect
-            label="Category"
-            options={categories}
-            value={categoryId}
-            onChange={setCategoryId}
-            onCreate={(newName) => createCategoryAction({ name: newName })}
-          />
+          <div className="space-y-1.5">
+            <InlineCreatableSelect
+              label="Category"
+              options={categories}
+              value={categoryId}
+              onChange={setCategoryId}
+              onCreate={(newName) => createCategoryAction({ name: newName })}
+            />
+            {categories.find((c) => c.id === categoryId)?.sizeChartId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSizeSyncError(null);
+                  startSizeSync(async () => {
+                    const result = await syncCategorySizeChartAction(categoryId);
+                    if (!result.success) {
+                      setSizeSyncError(result.error);
+                      return;
+                    }
+                    setAttributeOptions((prev) => {
+                      const withoutSize = prev.filter((a) => a.id !== result.attributeId);
+                      return [...withoutSize, { id: result.attributeId, name: "Size", values: result.values }];
+                    });
+                    setPresetSelection({ attributeId: result.attributeId, valueIds: result.selectedValueIds });
+                  });
+                }}
+                disabled={isSyncingSizes}
+                className="text-xs font-medium text-brand-purple hover:underline disabled:opacity-50"
+              >
+                {isSyncingSizes ? "Loading sizes…" : "Load this category's sizes into variants"}
+              </button>
+            )}
+            {sizeSyncError && <p className="text-xs text-brand-danger">{sizeSyncError}</p>}
+          </div>
           <InlineCreatableSelect
             label="Brand"
             options={brands}
@@ -246,10 +281,12 @@ export function ProductForm({
       >
         <VariantGenerator
           productName={name}
-          attributes={attributes}
+          attributes={attributeOptions}
           defaults={{ costPrice, sellingPrice }}
           rows={variantRows}
           onChange={setVariantRows}
+          presetSelection={presetSelection}
+          onPresetApplied={() => setPresetSelection(null)}
         />
       </Section>
 

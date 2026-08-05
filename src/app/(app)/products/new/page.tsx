@@ -30,7 +30,11 @@ export default async function NewProductPage() {
         <h1 className="font-display text-2xl font-bold text-brand-black">Add product</h1>
       </div>
 
-      <ProductForm categories={categories} brands={brands} attributes={attributes} />
+      <ProductForm
+        categories={categories.map((c) => ({ id: c.id, name: c.name, sizeChartId: c.sizeChartId }))}
+        brands={brands}
+        attributes={attributes}
+      />
     </div>
   );
 }

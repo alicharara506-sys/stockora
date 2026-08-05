@@ -11,6 +11,9 @@ import { CreateRoleDialog } from "@/components/settings/create-role-dialog";
 import { EditRoleDialog } from "@/components/settings/edit-role-dialog";
 import { PlanPicker } from "@/components/settings/plan-picker";
 import { CancelSubscriptionButton } from "@/components/settings/cancel-subscription-button";
+import { CategoryManager } from "@/components/settings/catalog/category-manager";
+import { SizeChartManager } from "@/components/settings/catalog/size-chart-manager";
+import { AttributeManager } from "@/components/settings/catalog/attribute-manager";
 
 function groupPermissions() {
   const groups = new Map<string, { group: string; permissions: typeof PERMISSION_DEFINITIONS }>();
@@ -27,25 +30,42 @@ export default async function SettingsPage() {
   const context = await requireBusinessContext();
   const canManage = context.permissions.has(PERMISSIONS.CHANGE_SETTINGS);
   const canManageBilling = context.permissions.has(PERMISSIONS.MANAGE_SUBSCRIPTIONS);
+  const canManageCatalog = context.permissions.has(PERMISSIONS.MANAGE_PRODUCTS);
   const groups = groupPermissions();
 
-  const [roles, subscription, plans, invoices, branchCount, userCount, aiUsage] = await Promise.all([
-    prisma.role.findMany({
-      where: { businessId: context.business.id },
-      include: { permissions: { include: { permission: true } } },
-      orderBy: [{ isSystem: "desc" }, { name: "asc" }],
-    }),
-    prisma.subscription.findUnique({ where: { businessId: context.business.id }, include: { plan: true } }),
-    prisma.plan.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-    prisma.invoice.findMany({
-      where: { businessId: context.business.id },
-      orderBy: { issuedAt: "desc" },
-      take: 12,
-    }),
-    prisma.branch.count({ where: { businessId: context.business.id } }),
-    prisma.businessMembership.count({ where: { businessId: context.business.id, status: "ACTIVE" } }),
-    getUsageStatus(context.business.id, context.userId),
-  ]);
+  const [roles, subscription, plans, invoices, branchCount, userCount, aiUsage, categories, sizeCharts, attributes] =
+    await Promise.all([
+      prisma.role.findMany({
+        where: { businessId: context.business.id },
+        include: { permissions: { include: { permission: true } } },
+        orderBy: [{ isSystem: "desc" }, { name: "asc" }],
+      }),
+      prisma.subscription.findUnique({ where: { businessId: context.business.id }, include: { plan: true } }),
+      prisma.plan.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+      prisma.invoice.findMany({
+        where: { businessId: context.business.id },
+        orderBy: { issuedAt: "desc" },
+        take: 12,
+      }),
+      prisma.branch.count({ where: { businessId: context.business.id } }),
+      prisma.businessMembership.count({ where: { businessId: context.business.id, status: "ACTIVE" } }),
+      getUsageStatus(context.business.id, context.userId),
+      prisma.category.findMany({
+        where: { businessId: context.business.id },
+        include: { _count: { select: { products: true } } },
+        orderBy: { name: "asc" },
+      }),
+      prisma.sizeChart.findMany({
+        where: { businessId: context.business.id },
+        include: { values: { orderBy: { sortOrder: "asc" } } },
+        orderBy: { name: "asc" },
+      }),
+      prisma.attribute.findMany({
+        where: { businessId: context.business.id },
+        include: { values: { orderBy: { value: "asc" } } },
+        orderBy: { name: "asc" },
+      }),
+    ]);
 
   return (
     <div className="space-y-6">
@@ -123,6 +143,64 @@ export default async function SettingsPage() {
               })}
             </div>
           </div>
+        }
+        catalog={
+          canManageCatalog ? (
+            <div className="space-y-8">
+              <div>
+                <h2 className="font-display text-base font-semibold text-brand-black">Categories</h2>
+                <p className="mt-1 text-sm text-brand-muted">
+                  Organize products into categories and give each one its own size system.
+                </p>
+                <div className="mt-4">
+                  <CategoryManager
+                    categories={categories.map((c) => ({
+                      id: c.id,
+                      name: c.name,
+                      parentId: c.parentId,
+                      sizeChartId: c.sizeChartId,
+                      productCount: c._count.products,
+                    }))}
+                    sizeCharts={sizeCharts.map((s) => ({ id: s.id, name: s.name }))}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h2 className="font-display text-base font-semibold text-brand-black">Size charts</h2>
+                <p className="mt-1 text-sm text-brand-muted">
+                  Define the size systems used across your catalog — assign them to categories above.
+                </p>
+                <div className="mt-4">
+                  <SizeChartManager
+                    sizeCharts={sizeCharts.map((s) => ({
+                      id: s.id,
+                      name: s.name,
+                      values: s.values.map((v) => ({ id: v.id, value: v.value })),
+                    }))}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <h2 className="font-display text-base font-semibold text-brand-black">Attributes</h2>
+                <p className="mt-1 text-sm text-brand-muted">
+                  Color, material, and other variant attributes used when generating product variants.
+                </p>
+                <div className="mt-4">
+                  <AttributeManager
+                    attributes={attributes.map((a) => ({
+                      id: a.id,
+                      name: a.name,
+                      values: a.values.map((v) => ({ id: v.id, value: v.value, colorHex: v.colorHex })),
+                    }))}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-brand-muted">You don&apos;t have permission to manage the catalog.</p>
+          )
         }
         billing={
           <div className="space-y-6">

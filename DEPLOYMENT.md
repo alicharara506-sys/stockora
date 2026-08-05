@@ -22,6 +22,7 @@ Copy `.env.example` and fill in every value below for a production deployment.
 | `DATABASE_URL` | Yes | Postgres connection string. Include `?sslmode=require` for most managed providers. |
 | `NEXT_PUBLIC_APP_URL` | Yes | The public URL of the deployment — used to build absolute links in emails, QR codes, and the API reference panel. Must match the real domain in production (QR tokens embed this). |
 | `AUTH_SECRET` | Yes | Generate a fresh one per environment: `npx auth secret` or `openssl rand -base64 32`. Never reuse the dev value in production. |
+| `AUTH_TRUST_HOST` | Yes, behind a proxy | Set to `true` when the app runs behind a reverse proxy or in a container (Docker, Fly, Railway, self-hosted). Without it, a production build rejects every request with `UntrustedHost` and login is impossible. Vercel sets this automatically, so it can be omitted there. |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Optional | Omit both to hide the Google login button. |
 | `RESEND_API_KEY` / `EMAIL_FROM` | Optional | Without a key, auth emails are logged server-side instead of sent — fine for a demo, not for real users. |
 | `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Optional | Without a key, the AI assistant chat still works but replies that it isn't connected. |
@@ -46,6 +47,8 @@ roles, and plans) — don't run it against a production database that already ha
 ## 4. Production checklist
 
 - [ ] `AUTH_SECRET` is unique to this environment and not checked into any repo.
+- [ ] `AUTH_TRUST_HOST=true` is set if deploying anywhere other than Vercel — verify by loading the
+      login page on the real domain and signing in, not just by checking the process starts.
 - [ ] `DATABASE_URL` points at a database with TLS enabled and automated backups.
 - [ ] `NEXT_PUBLIC_APP_URL` matches the real public domain (affects QR code targets and email links).
 - [ ] Migrations are applied via `prisma migrate deploy` in the release pipeline, not manually.

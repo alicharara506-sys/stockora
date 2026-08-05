@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,14 +16,24 @@ export function VariantGenerator({
   defaults,
   rows,
   onChange,
+  presetSelection,
+  onPresetApplied,
 }: {
   productName: string;
   attributes: AttributeOption[];
   defaults: { costPrice: number; sellingPrice: number };
   rows: GeneratedVariantRow[];
   onChange: (rows: GeneratedVariantRow[]) => void;
+  /** When set, merges these value ids into the given attribute's selection
+   * and regenerates — used to apply a category's size chart in one click. */
+  presetSelection?: { attributeId: string; valueIds: string[] } | null;
+  onPresetApplied?: () => void;
 }) {
   const [selected, setSelected] = useState<Record<string, string[]>>({});
+  const selectedRef = useRef(selected);
+  useEffect(() => {
+    selectedRef.current = selected;
+  });
 
   function toggleValue(attributeId: string, valueId: string) {
     setSelected((prev) => {
@@ -52,6 +62,24 @@ export function VariantGenerator({
     if (rows.length === 0) regenerate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Applies a category's synced size values (e.g. from "Load category sizes")
+  // by merging them into the current selection and regenerating immediately.
+  useEffect(() => {
+    if (!presetSelection) return;
+    const merged = { ...selectedRef.current, [presetSelection.attributeId]: presetSelection.valueIds };
+    setSelected(merged);
+
+    const groups: AttributeValueOption[][] = attributes
+      .map((attribute) => {
+        const selectedIds = merged[attribute.id] ?? [];
+        return attribute.values.filter((value) => selectedIds.includes(value.id));
+      })
+      .filter((group) => group.length > 0);
+    onChange(generateVariantRows(productName || "Product", groups, defaults));
+    onPresetApplied?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presetSelection]);
 
   function updateRow(key: string, patch: Partial<GeneratedVariantRow>) {
     onChange(rows.map((row) => (row.key === key ? { ...row, ...patch } : row)));

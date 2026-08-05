@@ -392,18 +392,21 @@ model CashMovement {
 // ---------------------------------------------------------------------------
 
 model Category {
-  id         String   @id @default(cuid())
-  businessId String
-  name       String
-  parentId   String?
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String
+  parentId    String?
+  sizeChartId String?
+  createdAt   DateTime @default(now())
 
-  business Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  parent   Category?  @relation("CategoryToSubcategory", fields: [parentId], references: [id])
-  children Category[] @relation("CategoryToSubcategory")
-  products Product[]
+  business  Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  parent    Category?  @relation("CategoryToSubcategory", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryToSubcategory")
+  products  Product[]
+  sizeChart SizeChart? @relation(fields: [sizeChartId], references: [id])
 
   @@unique([businessId, name, parentId])
+  @@index([sizeChartId])
 }
 
 model Brand {
@@ -472,8 +475,9 @@ model SizeChart {
   name       String
   createdAt  DateTime @default(now())
 
-  business Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  values   SizeChartValue[]
+  business   Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  values     SizeChartValue[]
+  categories Category[]
 
   @@unique([businessId, name])
 }

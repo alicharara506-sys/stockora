@@ -12,7 +12,7 @@ import { ensurePlansSeeded } from "@/lib/plans";
 import { SYSTEM_ROLES, PERMISSIONS } from "@/lib/permissions/constants";
 import { createBranchForBusiness } from "@/server/services/branches";
 import { requirePermission } from "@/lib/tenancy";
-import { ensureBaseAttributesSeeded } from "@/lib/catalog/seed";
+import { ensureBaseAttributesSeeded, ensureBaseCatalogSeeded } from "@/lib/catalog/seed";
 import { logAudit } from "@/lib/audit";
 
 const createBusinessSchema = z.object({
@@ -70,6 +70,7 @@ export async function createBusinessAction(input: unknown): Promise<ActionResult
   const roles = await ensureSystemRolesSeeded(businessId);
   const ownerRole = roles.find((role) => role.key === SYSTEM_ROLES.OWNER)!;
   await ensureBaseAttributesSeeded(businessId);
+  await ensureBaseCatalogSeeded(businessId);
 
   await prisma.businessMembership.create({
     data: {

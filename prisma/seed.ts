@@ -3,6 +3,7 @@ import { hashPassword } from "../src/lib/auth/password";
 import { ensureSystemRolesSeeded } from "../src/lib/permissions/seed";
 import { ensurePlansSeeded } from "../src/lib/plans";
 import { SYSTEM_ROLES } from "../src/lib/permissions/constants";
+import { ensureBaseCatalogSeeded } from "../src/lib/catalog/seed";
 
 async function main() {
   await ensurePlansSeeded();
@@ -99,6 +100,8 @@ async function main() {
       update: {},
     });
   }
+
+  await ensureBaseCatalogSeeded(business.id);
 
   const categoryNames = ["T-Shirts", "Dresses", "Jeans", "Shoes", "Baby Clothing", "Accessories"];
   const categories = await Promise.all(
