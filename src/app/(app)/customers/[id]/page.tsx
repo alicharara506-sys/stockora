@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, MessageCircle, Building2 } from "lucide-react";
 import { requireBusinessContext } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
@@ -62,6 +62,8 @@ export default async function CustomerDetailPage({
               name: customer.name,
               phone: customer.phone ?? "",
               email: customer.email ?? "",
+              whatsapp: customer.whatsapp ?? "",
+              company: customer.company ?? "",
               address: customer.address ?? "",
               birthday: customer.birthday ? customer.birthday.toISOString().slice(0, 10) : "",
               gender: customer.gender ?? "",
@@ -94,6 +96,16 @@ export default async function CustomerDetailPage({
           {customer.email && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
               <Mail className="size-4 text-brand-purple" /> {customer.email}
+            </div>
+          )}
+          {customer.whatsapp && (
+            <div className="flex items-center gap-2 text-sm text-brand-black">
+              <MessageCircle className="size-4 text-brand-purple" /> {customer.whatsapp}
+            </div>
+          )}
+          {customer.company && (
+            <div className="flex items-center gap-2 text-sm text-brand-black">
+              <Building2 className="size-4 text-brand-purple" /> {customer.company}
             </div>
           )}
           {customer.address && (

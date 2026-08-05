@@ -15,6 +15,7 @@ import { CategoryManager } from "@/components/settings/catalog/category-manager"
 import { SizeChartManager } from "@/components/settings/catalog/size-chart-manager";
 import { AttributeManager } from "@/components/settings/catalog/attribute-manager";
 import { TaxManager } from "@/components/settings/tax/tax-manager";
+import { CheckoutPolicyForm } from "@/components/settings/checkout-policy-form";
 
 function groupPermissions() {
   const groups = new Map<string, { group: string; permissions: typeof PERMISSION_DEFINITIONS }>();
@@ -88,24 +89,50 @@ export default async function SettingsPage() {
 
       <SettingsTabs
         general={
-          <Card>
-            <CardHeader>
-              <CardTitle>Business profile</CardTitle>
-              <CardDescription>Basic information about your business.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {canManage ? (
-                <BusinessProfileForm
-                  name={context.business.name}
-                  industry={context.business.industry}
-                />
-              ) : (
-                <p className="text-sm text-brand-muted">
-                  You don&apos;t have permission to change business settings.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Business profile</CardTitle>
+                <CardDescription>Basic information about your business.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {canManage ? (
+                  <BusinessProfileForm
+                    name={context.business.name}
+                    industry={context.business.industry}
+                  />
+                ) : (
+                  <p className="text-sm text-brand-muted">
+                    You don&apos;t have permission to change business settings.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Checkout</CardTitle>
+                <CardDescription>
+                  Whether cashiers must capture customer details to finalize a sale.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {canManage ? (
+                  <CheckoutPolicyForm
+                    policy={{
+                      requireCustomerAtCheckout: businessSetting?.requireCustomerAtCheckout ?? false,
+                      requireCustomerPhone: businessSetting?.requireCustomerPhone ?? true,
+                      requireCustomerEmail: businessSetting?.requireCustomerEmail ?? false,
+                    }}
+                  />
+                ) : (
+                  <p className="text-sm text-brand-muted">
+                    You don&apos;t have permission to change business settings.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         }
         roles={
           <div className="space-y-5">

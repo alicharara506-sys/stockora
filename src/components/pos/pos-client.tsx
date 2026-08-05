@@ -7,6 +7,7 @@ import { CartPanel } from "@/components/pos/cart-panel";
 import { CheckoutDialog } from "@/components/pos/checkout-dialog";
 import { CloseRegisterDialog } from "@/components/pos/close-register-dialog";
 import type { PosCustomer } from "@/components/pos/customer-picker";
+import type { CaptureRequirements } from "@/components/pos/customer-capture-form";
 import type { CartLine, PosVariant } from "@/components/pos/types";
 
 export function PosClient({
@@ -15,12 +16,16 @@ export function PosClient({
   registerSessionId,
   branchId,
   openingCash,
+  requireCustomer,
+  captureRequirements,
 }: {
   variants: PosVariant[];
   customers: PosCustomer[];
   registerSessionId: string;
   branchId: string;
   openingCash: number;
+  requireCustomer: boolean;
+  captureRequirements: CaptureRequirements;
 }) {
   const router = useRouter();
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -110,6 +115,8 @@ export function PosClient({
         registerSessionId={registerSessionId}
         branchId={branchId}
         customerId={customerId}
+        requireCustomer={requireCustomer}
+        captureRequirements={captureRequirements}
         onSuccess={onSaleComplete}
       />
     </div>

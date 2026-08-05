@@ -149,3 +149,50 @@ async function uniqueSlug(name: string) {
     candidate = `${base}-${suffix}`;
   }
 }
+
+const checkoutPolicySchema = z.object({
+  requireCustomerAtCheckout: z.boolean(),
+  requireCustomerPhone: z.boolean(),
+  requireCustomerEmail: z.boolean(),
+});
+
+/** Controls whether a sale can be finalized without customer details. */
+export async function updateCheckoutPolicyAction(input: unknown): Promise<ActionResult> {
+  const context = await requirePermission(PERMISSIONS.CHANGE_SETTINGS);
+
+  const parsed = checkoutPolicySchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+  const data = parsed.data;
+
+  const before = await prisma.businessSetting.findUnique({
+    where: { businessId: context.business.id },
+  });
+
+  await prisma.businessSetting.upsert({
+    where: { businessId: context.business.id },
+    create: { businessId: context.business.id, ...data },
+    update: data,
+  });
+
+  await logAudit({
+    businessId: context.business.id,
+    userId: context.userId,
+    action: "business.update_checkout_policy",
+    entityType: "BusinessSetting",
+    entityId: context.business.id,
+    before: before
+      ? {
+          requireCustomerAtCheckout: before.requireCustomerAtCheckout,
+          requireCustomerPhone: before.requireCustomerPhone,
+          requireCustomerEmail: before.requireCustomerEmail,
+        }
+      : null,
+    after: data,
+  });
+
+  revalidatePath("/settings");
+  revalidatePath("/pos");
+  return { success: true };
+}

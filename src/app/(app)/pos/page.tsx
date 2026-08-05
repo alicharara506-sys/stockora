@@ -55,12 +55,15 @@ export default async function PosPage() {
       stock: b.quantityOnHand,
     }));
 
-  const customers = await prisma.customer.findMany({
-    where: { businessId: context.business.id },
-    select: { id: true, name: true, phone: true },
-    orderBy: { name: "asc" },
-    take: 200,
-  });
+  const [customers, setting] = await Promise.all([
+    prisma.customer.findMany({
+      where: { businessId: context.business.id },
+      select: { id: true, name: true, phone: true },
+      orderBy: { name: "asc" },
+      take: 200,
+    }),
+    prisma.businessSetting.findUnique({ where: { businessId: context.business.id } }),
+  ]);
 
   return (
     <PosClient
@@ -69,6 +72,11 @@ export default async function PosPage() {
       registerSessionId={session.id}
       branchId={register.branchId}
       openingCash={Number(session.openingCash)}
+      requireCustomer={setting?.requireCustomerAtCheckout ?? false}
+      captureRequirements={{
+        phone: setting?.requireCustomerPhone ?? true,
+        email: setting?.requireCustomerEmail ?? false,
+      }}
     />
   );
 }

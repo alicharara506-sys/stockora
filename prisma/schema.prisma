@@ -851,6 +851,8 @@ model Customer {
   name               String
   phone              String?
   email              String?
+  whatsapp           String?
+  company            String?
   address            String?
   birthday           DateTime?
   gender             String?
@@ -1580,6 +1582,14 @@ model BusinessSetting {
   taxCountry            String?
   /// VAT/GST registration number printed on invoices and receipts.
   taxRegistrationNumber String?
+
+  /// When true, a sale cannot be finalized without a customer on it. Defaults
+  /// to false so anonymous walk-in sales keep working until an admin opts in.
+  requireCustomerAtCheckout Boolean @default(false)
+  /// Which captured customer fields are mandatory when the above is on.
+  /// Name is always required; these add to it.
+  requireCustomerPhone      Boolean @default(true)
+  requireCustomerEmail      Boolean @default(false)
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }

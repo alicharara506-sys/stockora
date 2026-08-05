@@ -15,6 +15,8 @@ interface CustomerFormValues {
   name: string;
   phone: string;
   email: string;
+  whatsapp: string;
+  company: string;
   address: string;
   birthday: string;
   gender: string;
@@ -39,6 +41,8 @@ export function CustomerForm({
     name: initial?.name ?? "",
     phone: initial?.phone ?? "",
     email: initial?.email ?? "",
+    whatsapp: initial?.whatsapp ?? "",
+    company: initial?.company ?? "",
     address: initial?.address ?? "",
     birthday: initial?.birthday ?? "",
     gender: initial?.gender ?? "",
@@ -91,6 +95,14 @@ export function CustomerForm({
         <div className="space-y-1.5">
           <Label htmlFor="customer-email">Email</Label>
           <Input id="customer-email" type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="customer-whatsapp">WhatsApp</Label>
+          <Input id="customer-whatsapp" type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="customer-company">Company</Label>
+          <Input id="customer-company" value={form.company} onChange={(e) => set("company", e.target.value)} />
         </div>
         <div className="sm:col-span-2 space-y-1.5">
           <Label htmlFor="customer-address">Address</Label>

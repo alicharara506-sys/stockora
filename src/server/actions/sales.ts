@@ -5,6 +5,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/tenancy";
 import { checkoutSchema } from "@/lib/validation/pos";
+import { normalizePhone, normalizeName } from "@/lib/validation/customers";
 import { applyInventoryMovement, InsufficientStockError } from "@/server/services/inventory";
 import { loadTaxContext, resolveRules } from "@/lib/tax/resolve";
 import { calculateCartTax } from "@/lib/tax/calculate";
@@ -39,11 +40,65 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
     return { success: false, error: "This branch has no stock location configured." };
   }
 
-  const customer = data.customerId
+  let customer = data.customerId
     ? await prisma.customer.findFirst({ where: { id: data.customerId, businessId: context.business.id } })
     : null;
   if (data.customerId && !customer) {
     return { success: false, error: "Customer not found." };
+  }
+
+  // Captured-at-the-till details are matched against existing customers so a
+  // repeat buyer stays one record with one history rather than gaining a new
+  // row on every visit.
+  //
+  // The name must match as well as the phone. Phone alone is not identity:
+  // households and colleagues share numbers, and a phone-only match would
+  // silently file one person's purchase — and their loyalty points and spend
+  // — under someone else's account. When the number matches but the name
+  // doesn't, a separate customer is created instead.
+  //
+  // The lookup is read-only here; the write happens inside the sale
+  // transaction so a checkout that fails on stock leaves no orphan behind.
+  const captured = !customer ? data.newCustomer : undefined;
+  if (captured?.phone) {
+    const digits = normalizePhone(captured.phone);
+    const capturedName = normalizeName(captured.name);
+    if (digits.length >= 6) {
+      const candidates = await prisma.customer.findMany({
+        where: { businessId: context.business.id, phone: { not: null } },
+        select: { id: true, phone: true, name: true },
+      });
+      const match = candidates.find(
+        (c) => normalizePhone(c.phone ?? "") === digits && normalizeName(c.name) === capturedName,
+      );
+      if (match) {
+        customer = await prisma.customer.findUnique({ where: { id: match.id } });
+      }
+    }
+  }
+  const customerToCreate = customer ? undefined : captured;
+
+  // Enforced server-side: the UI gate alone would be bypassable by anyone
+  // calling the action directly.
+  if (setting?.requireCustomerAtCheckout) {
+    const name = customer?.name ?? customerToCreate?.name;
+    const phone = customer?.phone ?? customerToCreate?.phone;
+    const email = customer?.email ?? customerToCreate?.email;
+
+    if (!name) {
+      return { success: false, error: "This sale needs customer details before it can be completed." };
+    }
+    if (setting.requireCustomerPhone && !phone) {
+      return { success: false, error: "A phone number is required to complete this sale." };
+    }
+    if (setting.requireCustomerEmail && !email) {
+      return { success: false, error: "An email address is required to complete this sale." };
+    }
+  }
+
+  // A customer being created right now has no balance to spend.
+  if (data.paymentMethod === "STORE_CREDIT" && customerToCreate) {
+    return { success: false, error: "A new customer has no store credit yet. Choose another payment method." };
   }
 
   const [variants, taxContext] = await Promise.all([
@@ -98,6 +153,23 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
 
   try {
     const saleId = await prisma.$transaction(async (tx) => {
+      // Created here rather than earlier so a rollback (e.g. insufficient
+      // stock) doesn't leave a customer behind for a sale that never happened.
+      const saleCustomer = customerToCreate
+        ? await tx.customer.create({
+            data: {
+              businessId: context.business.id,
+              name: customerToCreate.name,
+              phone: customerToCreate.phone || null,
+              email: customerToCreate.email || null,
+              whatsapp: customerToCreate.whatsapp || null,
+              company: customerToCreate.company || null,
+              notes: customerToCreate.notes || null,
+              marketingConsent: customerToCreate.marketingConsent,
+            },
+          })
+        : customer;
+
       const saleNumber = await nextSaleNumber(tx, context.business.id);
 
       const sale = await tx.sale.create({
@@ -107,7 +179,7 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
           registerSessionId: session.id,
           saleNumber,
           employeeId: context.userId,
-          customerId: customer?.id,
+          customerId: saleCustomer?.id,
           currency: context.business.baseCurrency,
           subtotal,
           discountTotal: data.discountTotal,
@@ -171,13 +243,13 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
         });
       }
 
-      if (customer) {
+      if (saleCustomer) {
         const loyaltyEarned = Math.floor(total);
 
         if (data.paymentMethod === "STORE_CREDIT") {
           await tx.customerCreditTransaction.create({
             data: {
-              customerId: customer.id,
+              customerId: saleCustomer.id,
               type: "REDEEM",
               amount: total,
               referenceType: "Sale",
@@ -189,7 +261,7 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
         if (loyaltyEarned > 0) {
           await tx.loyaltyTransaction.create({
             data: {
-              customerId: customer.id,
+              customerId: saleCustomer.id,
               type: "EARN",
               points: loyaltyEarned,
               referenceType: "Sale",
@@ -199,7 +271,7 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
         }
 
         await tx.customer.update({
-          where: { id: customer.id },
+          where: { id: saleCustomer.id },
           data: {
             totalSpent: { increment: total },
             lastPurchaseAt: new Date(),

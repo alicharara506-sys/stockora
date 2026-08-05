@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { checkoutCustomerSchema } from "@/lib/validation/customers";
 
 export const paymentMethodValues = [
   "CASH",
@@ -20,6 +21,8 @@ export const checkoutSchema = z.object({
   registerSessionId: z.string().min(1),
   branchId: z.string().min(1),
   customerId: z.string().optional().or(z.literal("")),
+  /** Details for a customer captured at the till, when none was picked. */
+  newCustomer: checkoutCustomerSchema.optional(),
   items: z.array(checkoutItemSchema).min(1, "Add at least one item"),
   discountTotal: z.number().min(0).default(0),
   paymentMethod: z.enum(paymentMethodValues),
