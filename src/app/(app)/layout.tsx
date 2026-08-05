@@ -3,10 +3,12 @@ import { daysUntil } from "@/lib/dates/days-until";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
+import { getMessages } from "@/lib/i18n/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const context = await requireBusinessContext();
   const trialDaysLeft = daysUntil(context.business.trialEndsAt);
+  const { messages } = await getMessages();
 
   const mainBranch = await prisma.branch.findFirst({
     where: { businessId: context.business.id, isMainBranch: true },
@@ -17,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* Lets keyboard and screen-reader users jump past the sidebar, which
           otherwise costs ~18 tab stops on every page. */}
       <a href="#main-content" className="skip-link rounded-lg bg-brand-purple px-4 py-2 text-sm font-semibold text-white">
-        Skip to content
+        {messages.nav.skipToContent}
       </a>
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">

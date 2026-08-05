@@ -43,7 +43,10 @@ export function RankedBarChart({ data, valuePrefix = "$", emptyLabel = "No data 
   const height = Math.max(120, data.length * rowHeight);
 
   return (
-    <div className="w-full" style={{ height }}>
+      // dir="ltr": Recharts lays its SVG out with absolute coordinates that
+      // ignore text direction, so an RTL page collides bars with labels.
+      // Numeric axes conventionally read left-to-right regardless of locale.
+    <div className="w-full" dir="ltr" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}

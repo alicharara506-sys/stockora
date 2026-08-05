@@ -5,9 +5,11 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { APP_NAV } from "@/lib/nav";
+import { useTranslations } from "@/lib/i18n/client";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col bg-brand-sidebar print:hidden lg:flex">
@@ -31,7 +33,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="size-5 shrink-0" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}

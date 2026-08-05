@@ -1,10 +1,12 @@
 import { Building2, LogOut } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { getMessages } from "@/lib/i18n/server";
 import { MobileSidebar } from "@/components/dashboard/mobile-sidebar";
 import { signOutAction } from "@/server/actions/session";
 
-export function Topbar({
+export async function Topbar({
   businessName,
   branchName,
   trialDaysLeft,
@@ -15,6 +17,8 @@ export function Topbar({
   trialDaysLeft: number | null;
   userName: string;
 }) {
+  const { messages } = await getMessages();
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-brand-border bg-brand-surface px-4 print:hidden sm:px-6">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -32,6 +36,7 @@ export function Topbar({
             {trialDaysLeft > 0 ? `${trialDaysLeft} days left in trial` : "Trial ended"}
           </Badge>
         )}
+        <LanguageSwitcher />
         <ThemeToggle />
         <span className="hidden text-sm text-brand-muted sm:inline">{userName}</span>
         <form action={signOutAction}>
@@ -40,7 +45,7 @@ export function Topbar({
             className="flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-brand-muted transition-colors hover:bg-brand-purple-lightest hover:text-brand-accent"
           >
             <LogOut className="size-4" />
-            <span className="hidden sm:inline">Sign out</span>
+            <span className="hidden sm:inline">{messages.nav.signOut}</span>
           </button>
         </form>
       </div>

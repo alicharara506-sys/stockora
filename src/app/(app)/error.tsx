@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslations } from "@/lib/i18n/client";
 
 /**
  * Catches render and data errors inside the app shell so one broken page
@@ -16,6 +17,9 @@ export default function AppError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("errors");
+  const tc = useTranslations("common");
+
   useEffect(() => {
     // Surfaced server-side too, but logging here keeps the digest alongside
     // whatever the browser recorded just before the failure.
@@ -29,19 +33,19 @@ export default function AppError({
           <AlertTriangle className="size-6" aria-hidden="true" />
         </div>
         <h1 className="font-display text-lg font-semibold text-brand-black">
-          Something went wrong
+          {t("pageTitle")}
         </h1>
         <p className="max-w-md text-sm text-brand-muted">
-          This page couldn&apos;t load. Your data is safe — nothing was changed.
+          {t("pageBody")}
         </p>
         {error.digest && (
           <p className="text-xs text-brand-muted">
-            Reference: <code className="font-mono">{error.digest}</code>
+            {t("reference")}: <code className="font-mono">{error.digest}</code>
           </p>
         )}
         <Button onClick={reset} className="mt-2">
           <RotateCcw className="size-4" />
-          Try again
+          {tc("tryAgain")}
         </Button>
       </CardContent>
     </Card>

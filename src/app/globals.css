@@ -125,7 +125,15 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  /* --font-arabic is only defined when the Arabic locale is active, so it
+     leads the stack there and is simply absent everywhere else. */
+  font-family: var(--font-arabic), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Arabic headings use the same face as body text: Poppins has no Arabic
+   glyphs, so keeping it would silently fall back mid-heading. */
+[dir="rtl"] .font-display {
+  font-family: var(--font-arabic), var(--font-sans), sans-serif;
 }
 
 /* Shadows read as dirt on dark surfaces; depth comes from the raised surface
@@ -168,14 +176,27 @@ body {
   }
 
   /* Skips straight to content, for keyboard and screen-reader users who would
-     otherwise tab through the whole sidebar on every page. */
+     otherwise tab through the whole sidebar on every page.
+     Hidden by clipping rather than by `left: -9999px`: under RTL the scroll
+     origin flips, so a far-negative offset really does extend the document
+     and gives every page an 11000px horizontal scrollbar. Clipping takes the
+     element out of the layout without moving it anywhere. */
   .skip-link {
     position: absolute;
-    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
     z-index: 100;
   }
   .skip-link:focus {
-    left: 1rem;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    /* Logical property, so it lands on the correct side in both directions. */
+    inset-inline-start: 1rem;
     top: 1rem;
   }
 

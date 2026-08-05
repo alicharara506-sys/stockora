@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AlertTriangle, DollarSign, Receipt, TrendingDown, TrendingUp, Users } from "lucide-react";
 import { requireBusinessContext } from "@/lib/tenancy";
+import { getMessages, interpolate } from "@/lib/i18n/server";
 import { prisma } from "@/lib/prisma";
 import { resolveDateRange } from "@/lib/reports/date-range";
 import { getReportData } from "@/lib/reports/queries";
@@ -20,6 +21,8 @@ function formatChange(current: number, previous: number) {
 
 export default async function DashboardPage() {
   const context = await requireBusinessContext();
+  const { messages } = await getMessages();
+  const td = messages.dashboard;
   const businessId = context.business.id;
 
   const todayRange = resolveDateRange({ preset: "today" });
@@ -65,24 +68,24 @@ export default async function DashboardPage() {
 
   const summaryCards = [
     {
-      label: "Today's sales",
+      label: td.todaysSales,
       value: formatCurrency(todaySales),
       change: salesChange,
       icon: DollarSign,
     },
     {
-      label: "Today's orders",
+      label: td.todaysOrders,
       value: todayOrders.toLocaleString(),
       change: ordersChange,
       icon: Receipt,
     },
     {
-      label: "Team members",
+      label: td.teamMembers,
       value: memberCount.toLocaleString(),
       icon: Users,
     },
     {
-      label: "Low stock alerts",
+      label: td.lowStockAlerts,
       value: lowStock.length.toLocaleString(),
       icon: AlertTriangle,
     },
@@ -93,14 +96,14 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-brand-black">
-            Welcome to {context.business.name}
+            {interpolate(td.welcome, { business: context.business.name })}
           </h1>
           <p className="mt-1 text-sm text-brand-muted">
-            Signed in as <span className="font-medium text-brand-black">{context.role.name}</span>.
+            {interpolate(td.signedInAs, { role: context.role.name })}
           </p>
         </div>
         <Link href="/reports" className="text-sm font-medium text-brand-accent hover:underline">
-          View full reports
+          {td.viewFullReports}
         </Link>
       </div>
 
@@ -118,7 +121,7 @@ export default async function DashboardPage() {
                     }`}
                   >
                     {stat.change >= 0 ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
-                    {Math.abs(stat.change).toFixed(1)}% vs yesterday
+                    {Math.abs(stat.change).toFixed(1)}% {td.vsYesterday}
                   </p>
                 )}
               </div>
@@ -133,8 +136,8 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Sales this week</CardTitle>
-            <CardDescription>Net sales total per day, last 7 days.</CardDescription>
+            <CardTitle>{td.salesThisWeek}</CardTitle>
+            <CardDescription>{td.salesThisWeekHint}</CardDescription>
           </CardHeader>
           <CardContent>
             <SalesTrendChart data={weekReport.salesOverTime} />

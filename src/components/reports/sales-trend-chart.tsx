@@ -43,7 +43,10 @@ export function SalesTrendChart({ data }: SalesTrendChartProps) {
   }
 
   return (
-    <div className="h-64 w-full">
+      // dir="ltr": Recharts lays its SVG out with absolute coordinates that
+      // ignore text direction, so an RTL page collides bars with labels.
+      // Numeric axes conventionally read left-to-right regardless of locale.
+    <div className="h-64 w-full" dir="ltr">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>

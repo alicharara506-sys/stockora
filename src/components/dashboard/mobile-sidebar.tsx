@@ -8,10 +8,12 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { APP_NAV } from "@/lib/nav";
+import { useTranslations } from "@/lib/i18n/client";
 
 export function MobileSidebar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -56,7 +58,7 @@ export function MobileSidebar() {
                   )}
                 >
                   <Icon className="size-5 shrink-0" />
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               );
             })}

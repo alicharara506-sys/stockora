@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
+import { useTranslations } from "@/lib/i18n/client";
 
 export type ThemeChoice = "light" | "dark" | "system";
 
@@ -31,10 +32,10 @@ function apply(choice: ThemeChoice) {
   document.documentElement.classList.toggle("dark", dark);
 }
 
-const OPTIONS: { value: ThemeChoice; label: string; icon: typeof Sun }[] = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
+const OPTIONS: { value: ThemeChoice; icon: typeof Sun }[] = [
+  { value: "light", icon: Sun },
+  { value: "dark", icon: Moon },
+  { value: "system", icon: Monitor },
 ];
 
 /**
@@ -65,6 +66,7 @@ function getServerSnapshot(): ThemeChoice {
 
 export function ThemeToggle() {
   const choice = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const t = useTranslations("theme");
 
   // Following the OS while set to "system" means a machine that dims at
   // sunset dims the app too, without the user touching anything.
@@ -85,20 +87,21 @@ export function ThemeToggle() {
   return (
     <div
       role="group"
-      aria-label="Colour theme"
+      aria-label={t("label")}
       className="inline-flex items-center gap-0.5 rounded-full border border-brand-border bg-brand-surface p-0.5"
     >
       {OPTIONS.map((option) => {
         const Icon = option.icon;
+        const label = t(option.value);
         const active = choice === option.value;
         return (
           <button
             key={option.value}
             type="button"
             onClick={() => select(option.value)}
-            aria-label={`${option.label} theme`}
+            aria-label={label}
             aria-pressed={active}
-            title={`${option.label} theme`}
+            title={label}
             className={
               active
                 ? "flex size-7 cursor-pointer items-center justify-center rounded-full bg-brand-purple text-white transition-colors"
