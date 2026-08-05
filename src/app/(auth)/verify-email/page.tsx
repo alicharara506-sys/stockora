@@ -48,8 +48,8 @@ function StatusCard({
       <p
         className={
           success
-            ? "mt-4 rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-5 py-4 text-sm text-brand-purple"
-            : "mt-4 rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-brand-danger"
+            ? "mt-4 rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-5 py-4 text-sm text-brand-accent"
+            : "mt-4 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-5 py-4 text-sm text-brand-danger"
         }
       >
         {body}

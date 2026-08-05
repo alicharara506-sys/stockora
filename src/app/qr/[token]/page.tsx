@@ -30,7 +30,7 @@ export default async function QrScanPage({ params }: { params: Promise<{ token: 
           <CardContent className="p-6">
             {!resolution.ok ? (
               <div className="flex flex-col items-center gap-3 text-center">
-                <div className="flex size-12 items-center justify-center rounded-full bg-red-50 text-brand-danger">
+                <div className="flex size-12 items-center justify-center rounded-full bg-brand-danger/10 text-brand-danger">
                   <AlertTriangle className="size-5" />
                 </div>
                 <p className="font-display text-lg font-semibold text-brand-black">
@@ -58,7 +58,7 @@ function QrContent({
   if (qrCode.type === "STORE") {
     return (
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-purple">
+        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-accent">
           <Building2 className="size-5" />
         </div>
         <p className="font-display text-lg font-semibold text-brand-black">
@@ -72,7 +72,7 @@ function QrContent({
   if (qrCode.type === "PRODUCT") {
     return (
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-purple">
+        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-accent">
           <Package className="size-5" />
         </div>
         <p className="font-display text-lg font-semibold text-brand-black">
@@ -88,7 +88,7 @@ function QrContent({
     const currency = String(payload.currency ?? "USD");
     return (
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-purple">
+        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-accent">
           <Wallet className="size-5" />
         </div>
         <p className="text-sm text-brand-muted">Amount due</p>
@@ -109,7 +109,7 @@ function QrContent({
   if (qrCode.type === "RECEIPT") {
     return (
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-purple">
+        <div className="flex size-12 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-accent">
           <Receipt className="size-5" />
         </div>
         <p className="font-display text-lg font-semibold text-brand-black">
@@ -129,7 +129,7 @@ function QrContent({
       <p className="text-sm text-brand-muted">
         Scan this from inside Stockora while signed in to view stock details.
       </p>
-      <Link href="/inventory" className="text-sm font-medium text-brand-purple hover:underline">
+      <Link href="/inventory" className="text-sm font-medium text-brand-accent hover:underline">
         Go to inventory
       </Link>
     </div>

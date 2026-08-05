@@ -17,7 +17,7 @@ export function RevokeQrButton({ id }: { id: string }) {
           await revokeQrAction({ id });
         });
       }}
-      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-brand-danger hover:bg-red-50 disabled:opacity-50"
+      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-brand-danger hover:bg-brand-danger/10 disabled:opacity-50"
     >
       <Ban className="size-3.5" />
       Revoke

@@ -64,7 +64,7 @@ export default async function TransfersPage() {
       {transfers.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-purple-lightest text-brand-accent">
               <ArrowLeftRight className="size-6" />
             </div>
             <p className="font-display text-base font-semibold text-brand-black">No transfers yet</p>

@@ -103,7 +103,7 @@ export function VariantGenerator({
                     onClick={() => toggleValue(attribute.id, value.id)}
                     className={
                       isChecked
-                        ? "rounded-full border border-brand-purple bg-brand-purple-lightest px-3 py-1.5 text-xs font-medium text-brand-purple"
+                        ? "rounded-full border border-brand-purple bg-brand-purple-lightest px-3 py-1.5 text-xs font-medium text-brand-accent"
                         : "rounded-full border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-black hover:bg-brand-purple-lightest"
                     }
                   >

@@ -56,7 +56,7 @@ export default async function SalesPage() {
                 {sales.map((sale) => (
                   <tr key={sale.id} className="border-b border-brand-border last:border-0">
                     <td className="px-5 py-3">
-                      <Link href={`/sales/${sale.id}`} className="font-medium text-brand-black hover:text-brand-purple">
+                      <Link href={`/sales/${sale.id}`} className="font-medium text-brand-black hover:text-brand-accent">
                         {sale.saleNumber}
                       </Link>
                     </td>

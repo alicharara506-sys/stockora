@@ -14,6 +14,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen w-full bg-brand-bg">
+      {/* Lets keyboard and screen-reader users jump past the sidebar, which
+          otherwise costs ~18 tab stops on every page. */}
+      <a href="#main-content" className="skip-link rounded-lg bg-brand-purple px-4 py-2 text-sm font-semibold text-white">
+        Skip to content
+      </a>
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
@@ -22,7 +27,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           trialDaysLeft={trialDaysLeft}
           userName={context.membership.role.name}
         />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );

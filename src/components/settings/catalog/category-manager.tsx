@@ -113,7 +113,7 @@ export function CategoryManager({
   return (
     <div className="space-y-5">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -131,7 +131,7 @@ export function CategoryManager({
               <select
                 value={parentId}
                 onChange={(e) => setParentId(e.target.value)}
-                className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+                className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
               >
                 <option value="">Top level</option>
                 {items
@@ -148,7 +148,7 @@ export function CategoryManager({
               <select
                 value={sizeChartId}
                 onChange={(e) => setSizeChartId(e.target.value)}
-                className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+                className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
               >
                 <option value="">None</option>
                 {sizeCharts.map((s) => (
@@ -172,7 +172,7 @@ export function CategoryManager({
             <CardContent className="space-y-3 p-5">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                     <FolderTree className="size-4" />
                   </div>
                   <div>
@@ -197,7 +197,7 @@ export function CategoryManager({
                   value={parent.sizeChartId ?? ""}
                   onChange={(e) => onAssignSizeChart(parent.id, e.target.value)}
                   disabled={isPending}
-                  className="h-8 rounded-lg border border-brand-border bg-white px-2 text-xs text-brand-black"
+                  className="h-8 rounded-lg border border-brand-border bg-brand-surface px-2 text-xs text-brand-black"
                 >
                   <option value="">None</option>
                   {sizeCharts.map((s) => (

@@ -39,7 +39,7 @@ export default async function SupplierDetailPage({
       <div>
         <Link
           href="/suppliers"
-          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-purple"
+          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-accent"
         >
           <ArrowLeft className="size-4" />
           Back to suppliers
@@ -77,17 +77,17 @@ export default async function SupplierDetailPage({
         <CardContent className="grid gap-3 p-6 sm:grid-cols-2">
           {supplier.phone && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
-              <Phone className="size-4 text-brand-purple" /> {supplier.phone}
+              <Phone className="size-4 text-brand-accent" /> {supplier.phone}
             </div>
           )}
           {supplier.email && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
-              <Mail className="size-4 text-brand-purple" /> {supplier.email}
+              <Mail className="size-4 text-brand-accent" /> {supplier.email}
             </div>
           )}
           {supplier.address && (
             <div className="flex items-center gap-2 text-sm text-brand-black sm:col-span-2">
-              <MapPin className="size-4 text-brand-purple" /> {supplier.address}
+              <MapPin className="size-4 text-brand-accent" /> {supplier.address}
             </div>
           )}
           {supplier.contactPerson && (
@@ -118,7 +118,7 @@ export default async function SupplierDetailPage({
                   {purchaseOrders.map((po) => (
                     <tr key={po.id} className="border-b border-brand-border last:border-0">
                       <td className="px-5 py-3">
-                        <Link href={`/purchases/${po.id}`} className="font-medium text-brand-black hover:text-brand-purple">
+                        <Link href={`/purchases/${po.id}`} className="font-medium text-brand-black hover:text-brand-accent">
                           {po.poNumber}
                         </Link>
                       </td>

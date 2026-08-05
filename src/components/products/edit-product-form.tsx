@@ -73,9 +73,9 @@ export function EditProductForm({
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-brand-border bg-white p-6">
+    <div className="space-y-4 rounded-2xl border border-brand-border bg-brand-surface p-6">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -182,7 +182,7 @@ function SelectField<T extends string>({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as T)}
-        className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black"
+        className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black"
       >
         {options.map((option) => (
           <option key={option} value={option}>

@@ -108,7 +108,7 @@ export function ProductForm({
   return (
     <div className="space-y-6">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-3 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -156,7 +156,7 @@ export function ProductForm({
                   });
                 }}
                 disabled={isSyncingSizes}
-                className="text-xs font-medium text-brand-purple hover:underline disabled:opacity-50"
+                className="text-xs font-medium text-brand-accent hover:underline disabled:opacity-50"
               >
                 {isSyncingSizes ? "Loading sizes…" : "Load this category's sizes into variants"}
               </button>
@@ -210,7 +210,7 @@ export function ProductForm({
             {imageUrls.map((url, index) => (
               <span
                 key={url + index}
-                className="flex items-center gap-2 rounded-lg border border-brand-border bg-white px-3 py-1.5 text-xs text-brand-black"
+                className="flex items-center gap-2 rounded-lg border border-brand-border bg-brand-surface px-3 py-1.5 text-xs text-brand-black"
               >
                 {url}
                 <button
@@ -316,7 +316,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-brand-border bg-white p-6">
+    <div className="rounded-2xl border border-brand-border bg-brand-surface p-6">
       <h2 className="font-display text-base font-semibold text-brand-black">{title}</h2>
       {description && <p className="mt-1 text-sm text-brand-muted">{description}</p>}
       <div className="mt-4">{children}</div>
@@ -341,7 +341,7 @@ function SelectField<T extends string>({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as T)}
-        className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+        className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
       >
         {options.map((option) => (
           <option key={option} value={option}>

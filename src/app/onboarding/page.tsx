@@ -9,7 +9,7 @@ export default function OnboardingPage() {
         <Link href="/" className="mb-8 flex justify-center">
           <Logo />
         </Link>
-        <div className="rounded-2xl border border-brand-border bg-white p-8 shadow-card-lg">
+        <div className="rounded-2xl border border-brand-border bg-brand-surface p-8 shadow-card-lg">
           <h1 className="font-display text-xl font-bold text-brand-black">
             Set up your business
           </h1>

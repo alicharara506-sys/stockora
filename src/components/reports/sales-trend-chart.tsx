@@ -26,7 +26,7 @@ function TrendTooltip({
 }) {
   if (!active || !payload || payload.length === 0) return null;
   return (
-    <div className="rounded-lg border border-brand-border bg-white px-3 py-2 shadow-card-lg">
+    <div className="rounded-lg border border-brand-border bg-brand-surface px-3 py-2 shadow-card-lg">
       <p className="text-xs text-brand-muted">{label ? formatShortDate(label) : ""}</p>
       <p className="mt-0.5 text-sm font-semibold text-brand-black">{formatCurrency(payload[0].value)}</p>
     </div>

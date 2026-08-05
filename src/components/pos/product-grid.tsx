@@ -36,7 +36,7 @@ export function ProductGrid({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2 rounded-xl border border-brand-border bg-white px-3 py-2.5">
+      <div className="flex items-center gap-2 rounded-xl border border-brand-border bg-brand-surface px-3 py-2.5">
         <Search className="size-4 text-brand-muted" />
         <input
           value={query}
@@ -70,14 +70,14 @@ export function ProductGrid({
             type="button"
             onClick={() => variant.stock > 0 && onAdd(variant)}
             disabled={variant.stock <= 0}
-            className="flex flex-col items-start rounded-xl border border-brand-border bg-white p-3 text-left shadow-card transition-shadow hover:shadow-card-lg disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-col items-start rounded-xl border border-brand-border bg-brand-surface p-3 text-left shadow-card transition-shadow hover:shadow-card-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div className="mb-2 flex h-20 w-full items-center justify-center rounded-lg bg-brand-purple-lightest">
               {variant.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={variant.imageUrl} alt={variant.productName} className="h-full w-full rounded-lg object-cover" />
               ) : (
-                <span className="font-display text-lg font-bold text-brand-purple">
+                <span className="font-display text-lg font-bold text-brand-accent">
                   {variant.productName.slice(0, 1)}
                 </span>
               )}
@@ -85,7 +85,7 @@ export function ProductGrid({
             <p className="text-xs font-semibold text-brand-black">{variant.productName}</p>
             <p className="text-[11px] text-brand-muted">{variant.variantLabel}</p>
             <div className="mt-1.5 flex w-full items-center justify-between">
-              <span className="text-sm font-bold text-brand-purple">${variant.price.toFixed(2)}</span>
+              <span className="text-sm font-bold text-brand-accent">${variant.price.toFixed(2)}</span>
               <span className="text-[10px] text-brand-muted">{variant.stock} left</span>
             </div>
           </button>

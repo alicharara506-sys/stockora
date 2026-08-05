@@ -98,12 +98,12 @@ export function TaxManager({
   return (
     <div className="space-y-6">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
       {notice && (
-        <p className="rounded-xl border border-green-100 bg-green-50 px-4 py-2.5 text-sm text-brand-success">
+        <p className="rounded-xl border border-brand-success/30 bg-brand-success/10 px-4 py-2.5 text-sm text-brand-success">
           {notice}
         </p>
       )}
@@ -135,7 +135,7 @@ export function TaxManager({
           </div>
 
           {form.taxEnabled && activeRules === 0 && (
-            <p className="flex items-start gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-2.5 text-sm text-brand-warning">
+            <p className="flex items-start gap-2 rounded-xl border border-brand-warning/30 bg-brand-warning/10 px-4 py-2.5 text-sm text-brand-warning">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" />
               No active tax rules — nothing will be charged. Add a rule below.
             </p>
@@ -150,7 +150,7 @@ export function TaxManager({
                 onChange={(e) =>
                   saveSettings({ ...form, pricesIncludeTax: e.target.value === "inclusive" })
                 }
-                className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+                className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
               >
                 <option value="exclusive">Tax-exclusive — tax is added at checkout</option>
                 <option value="inclusive">Tax-inclusive — the tag price is the final price</option>
@@ -198,7 +198,7 @@ export function TaxManager({
                   e.target.value = "";
                 }
               }}
-              className="flex h-11 w-full max-w-sm rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+              className="flex h-11 w-full max-w-sm rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
             >
               <option value="">Choose a country…</option>
               {COUNTRY_TAX_PRESETS.map((preset) => (
@@ -231,7 +231,7 @@ export function TaxManager({
         {rules.length === 0 && !adding ? (
           <Card>
             <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
-              <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+              <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                 <Percent className="size-5" />
               </div>
               <p className="font-display text-sm font-semibold text-brand-black">No tax rules yet</p>
@@ -313,7 +313,7 @@ function AddRuleForm({ onClose }: { onClose: () => void }) {
             <select
               value={draft.system}
               onChange={(e) => setDraft({ ...draft, system: e.target.value as TaxRuleSystem })}
-              className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+              className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
             >
               {SYSTEMS.map((s) => (
                 <option key={s} value={s}>
@@ -327,7 +327,7 @@ function AddRuleForm({ onClose }: { onClose: () => void }) {
             <select
               value={draft.treatment}
               onChange={(e) => setDraft({ ...draft, treatment: e.target.value as TaxTreatment })}
-              className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+              className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
             >
               {TREATMENTS.map((t) => (
                 <option key={t} value={t}>
@@ -403,7 +403,7 @@ function TaxRuleCard({ rule }: { rule: TaxRuleRow }) {
       <CardContent className="space-y-3 p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
               <Percent className="size-4" />
             </div>
             <div>
@@ -422,7 +422,7 @@ function TaxRuleCard({ rule }: { rule: TaxRuleRow }) {
               type="button"
               onClick={() => setEditing((v) => !v)}
               disabled={isPending}
-              className="text-brand-muted hover:text-brand-purple disabled:opacity-50"
+              className="text-brand-muted hover:text-brand-accent disabled:opacity-50"
               aria-label={`Edit ${rule.name}`}
             >
               <Pencil className="size-4" />
@@ -480,7 +480,7 @@ function TaxRuleCard({ rule }: { rule: TaxRuleRow }) {
                 <select
                   value={draft.system}
                   onChange={(e) => setDraft({ ...draft, system: e.target.value as TaxRuleSystem })}
-                  className="h-9 w-full rounded-lg border border-brand-border bg-white px-2 text-sm"
+                  className="h-9 w-full rounded-lg border border-brand-border bg-brand-surface px-2 text-sm"
                 >
                   {SYSTEMS.map((s) => (
                     <option key={s} value={s}>
@@ -494,7 +494,7 @@ function TaxRuleCard({ rule }: { rule: TaxRuleRow }) {
                 <select
                   value={draft.treatment}
                   onChange={(e) => setDraft({ ...draft, treatment: e.target.value as TaxTreatment })}
-                  className="h-9 w-full rounded-lg border border-brand-border bg-white px-2 text-sm"
+                  className="h-9 w-full rounded-lg border border-brand-border bg-brand-surface px-2 text-sm"
                 >
                   {TREATMENTS.map((t) => (
                     <option key={t} value={t}>

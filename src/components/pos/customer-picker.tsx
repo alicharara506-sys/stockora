@@ -47,7 +47,7 @@ export function CustomerPicker({
       <Popover.Portal>
         <Popover.Content
           align="end"
-          className="z-50 w-64 rounded-xl border border-brand-border bg-white p-2 shadow-card-lg"
+          className="z-50 w-64 rounded-xl border border-brand-border bg-brand-surface p-2 shadow-card-lg"
         >
           <div className="flex items-center gap-1.5 rounded-lg border border-brand-border px-2 py-1.5">
             <Search className="size-3.5 text-brand-muted" />

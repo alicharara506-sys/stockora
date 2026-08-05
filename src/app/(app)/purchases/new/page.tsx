@@ -31,7 +31,7 @@ export default async function NewPurchaseOrderPage() {
       <div>
         <Link
           href="/purchases"
-          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-purple"
+          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-accent"
         >
           <ArrowLeft className="size-4" />
           Back to purchases
@@ -40,7 +40,7 @@ export default async function NewPurchaseOrderPage() {
       </div>
 
       {suppliers.length === 0 ? (
-        <p className="rounded-2xl border border-brand-border bg-white p-6 text-sm text-brand-muted">
+        <p className="rounded-2xl border border-brand-border bg-brand-surface p-6 text-sm text-brand-muted">
           Add a supplier first from the Suppliers page.
         </p>
       ) : (

@@ -14,7 +14,7 @@ import { MarketingFooter } from "@/components/marketing/footer";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-1 flex-col">
+    <div className="theme-light flex min-h-screen flex-1 flex-col bg-brand-bg text-brand-black">
       <MarketingHeader />
       <main className="flex-1">
         <Hero />

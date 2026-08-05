@@ -66,12 +66,12 @@ export function PayoutsPanel({
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
       {notice && (
-        <p className="rounded-xl border border-green-100 bg-green-50 px-4 py-2.5 text-sm text-brand-success">
+        <p className="rounded-xl border border-brand-success/30 bg-brand-success/10 px-4 py-2.5 text-sm text-brand-success">
           {notice}
         </p>
       )}
@@ -102,7 +102,7 @@ export function PayoutsPanel({
       {payouts.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
               <Wallet className="size-5" />
             </div>
             <p className="font-display text-sm font-semibold text-brand-black">
@@ -160,7 +160,7 @@ export function PayoutsPanel({
                               type="button"
                               onClick={() => setStatus(p.id, "APPROVED")}
                               disabled={isPending}
-                              className="text-xs font-medium text-brand-purple hover:underline disabled:opacity-50"
+                              className="text-xs font-medium text-brand-accent hover:underline disabled:opacity-50"
                             >
                               Approve
                             </button>
@@ -170,7 +170,7 @@ export function PayoutsPanel({
                               type="button"
                               onClick={() => setStatus(p.id, "PAID")}
                               disabled={isPending}
-                              className="text-xs font-medium text-brand-purple hover:underline disabled:opacity-50"
+                              className="text-xs font-medium text-brand-accent hover:underline disabled:opacity-50"
                             >
                               Mark paid
                             </button>

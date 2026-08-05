@@ -18,7 +18,7 @@ export function SettingsTabs({
 }) {
   return (
     <Tabs.Root defaultValue="general">
-      <Tabs.List className="inline-flex flex-wrap gap-1 rounded-full border border-brand-border bg-white p-1">
+      <Tabs.List className="inline-flex flex-wrap gap-1 rounded-full border border-brand-border bg-brand-surface p-1">
         <TabTrigger value="general">General</TabTrigger>
         <TabTrigger value="roles">Roles &amp; Permissions</TabTrigger>
         <TabTrigger value="catalog">Catalog</TabTrigger>

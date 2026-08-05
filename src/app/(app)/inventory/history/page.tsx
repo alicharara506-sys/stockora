@@ -40,7 +40,7 @@ export default async function InventoryHistoryPage() {
       <div>
         <Link
           href="/inventory"
-          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-purple"
+          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-accent"
         >
           <ArrowLeft className="size-4" />
           Back to inventory

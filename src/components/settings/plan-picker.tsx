@@ -44,13 +44,13 @@ export function PlanPicker({
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
 
       <div className="flex justify-center">
-        <div className="inline-flex gap-1 rounded-full border border-brand-border bg-white p-1">
+        <div className="inline-flex gap-1 rounded-full border border-brand-border bg-brand-surface p-1">
           {(["MONTHLY", "ANNUAL"] as const).map((c) => (
             <button
               key={c}
@@ -73,7 +73,7 @@ export function PlanPicker({
             <div
               key={plan.key}
               className={`rounded-2xl border p-5 ${
-                isCurrent ? "border-brand-purple bg-brand-purple-lightest/40" : "border-brand-border bg-white"
+                isCurrent ? "border-brand-purple bg-brand-purple-lightest/40" : "border-brand-border bg-brand-surface"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -87,7 +87,7 @@ export function PlanPicker({
               <ul className="mt-3 space-y-1.5">
                 {plan.features.slice(0, 4).map((f) => (
                   <li key={f} className="flex items-start gap-1.5 text-xs text-brand-muted">
-                    <Check className="mt-0.5 size-3 shrink-0 text-brand-purple" />
+                    <Check className="mt-0.5 size-3 shrink-0 text-brand-accent" />
                     {f}
                   </li>
                 ))}

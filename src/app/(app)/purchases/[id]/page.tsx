@@ -53,7 +53,7 @@ export default async function PurchaseOrderDetailPage({
       <div>
         <Link
           href="/purchases"
-          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-purple"
+          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-accent"
         >
           <ArrowLeft className="size-4" />
           Back to purchases

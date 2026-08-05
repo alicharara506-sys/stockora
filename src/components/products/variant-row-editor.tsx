@@ -86,7 +86,7 @@ export function VariantRowEditor({
           onClick={() => save({ ...values, isActive: !values.isActive })}
           className={
             values.isActive
-              ? "rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-brand-success"
+              ? "rounded-full bg-brand-success/10 px-2.5 py-1 text-xs font-medium text-brand-success"
               : "rounded-full bg-brand-bg px-2.5 py-1 text-xs font-medium text-brand-muted"
           }
         >

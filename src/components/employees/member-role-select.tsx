@@ -37,7 +37,7 @@ export function MemberRoleSelect({
         value={value}
         disabled={disabled || isPending}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 rounded-lg border border-brand-border bg-white px-2.5 text-sm text-brand-black disabled:opacity-50"
+        className="h-9 rounded-lg border border-brand-border bg-brand-surface px-2.5 text-sm text-brand-black disabled:opacity-50"
       >
         {roles.map((role) => (
           <option key={role.id} value={role.id}>

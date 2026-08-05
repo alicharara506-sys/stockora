@@ -19,7 +19,7 @@ export default async function LoginPage({
       </p>
 
       {error && (
-        <p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-brand-danger">
+        <p className="mt-4 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-3 text-sm text-brand-danger">
           {error === "RateLimited"
             ? "Too many sign-in attempts. Please wait a few minutes and try again."
             : "Invalid email or password. Please try again."}
@@ -35,7 +35,7 @@ export default async function LoginPage({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link href="/forgot-password" className="text-xs font-medium text-brand-purple hover:underline">
+            <Link href="/forgot-password" className="text-xs font-medium text-brand-accent hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -48,7 +48,7 @@ export default async function LoginPage({
 
       <p className="mt-8 text-center text-sm text-brand-muted">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-semibold text-brand-purple hover:underline">
+        <Link href="/signup" className="font-semibold text-brand-accent hover:underline">
           Start your free trial
         </Link>
       </p>

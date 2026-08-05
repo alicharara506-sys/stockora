@@ -33,7 +33,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   if (success) {
     return (
-      <div className="rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-5 py-4 text-sm text-brand-purple">
+      <div className="rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-5 py-4 text-sm text-brand-accent">
         Password updated — redirecting you to sign in…
       </div>
     );
@@ -42,7 +42,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   return (
     <form action={onSubmit} className="space-y-5">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-3 text-sm text-brand-danger">
           {error}
         </p>
       )}

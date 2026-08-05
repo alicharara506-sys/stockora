@@ -57,7 +57,7 @@ export default async function SaleReceiptPage({
       <div className="flex items-center justify-between print:hidden">
         <Link
           href="/sales"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-purple"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-accent"
         >
           <ArrowLeft className="size-4" />
           Back to sales
@@ -65,7 +65,7 @@ export default async function SaleReceiptPage({
         <PrintButton />
       </div>
 
-      <div className="rounded-2xl border border-brand-border bg-white p-8 shadow-card print:border-none print:shadow-none">
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-8 shadow-card print:border-none print:shadow-none">
         <div className="flex flex-col items-center text-center">
           <Logo />
           <p className="mt-2 text-xs text-brand-muted">{sale.branch.name}</p>

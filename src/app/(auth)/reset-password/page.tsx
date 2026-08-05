@@ -9,7 +9,7 @@ export default async function ResetPasswordPage({
 
   if (!token) {
     return (
-      <div className="rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-brand-danger">
+      <div className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-5 py-4 text-sm text-brand-danger">
         This reset link is missing its token. Request a new one from the forgot password page.
       </div>
     );

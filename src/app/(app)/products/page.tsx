@@ -29,12 +29,12 @@ export default async function ProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold text-brand-black">Products</h1>
           <p className="mt-1 text-sm text-brand-muted">{products.length} products</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href="/products/export">
               <Download className="size-4" />
@@ -55,7 +55,7 @@ export default async function ProductsPage() {
       {products.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-purple-lightest text-brand-accent">
               <Shirt className="size-6" />
             </div>
             <p className="font-display text-base font-semibold text-brand-black">
@@ -98,7 +98,7 @@ export default async function ProductsPage() {
                       <td className="px-5 py-3">
                         <Link
                           href={`/products/${product.id}`}
-                          className="font-medium text-brand-black hover:text-brand-purple"
+                          className="font-medium text-brand-black hover:text-brand-accent"
                         >
                           {product.name}
                         </Link>

@@ -82,7 +82,7 @@ export function ReturnFlow({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-brand-border bg-white p-6">
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-6">
         <Label htmlFor="saleNumber">Sale number</Label>
         <div className="mt-1.5 flex gap-2">
           <Input
@@ -100,7 +100,7 @@ export function ReturnFlow({
       </div>
 
       {sale && (
-        <div className="rounded-2xl border border-brand-border bg-white p-6">
+        <div className="rounded-2xl border border-brand-border bg-brand-surface p-6">
           <div className="flex items-center justify-between">
             <p className="font-display text-base font-semibold text-brand-black">
               Sale {sale.saleNumber}
@@ -109,12 +109,12 @@ export function ReturnFlow({
           </div>
 
           {success && (
-            <p className="mt-3 rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-4 py-2.5 text-sm text-brand-purple">
+            <p className="mt-3 rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-4 py-2.5 text-sm text-brand-accent">
               Return processed.
             </p>
           )}
           {submitError && (
-            <p className="mt-3 rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+            <p className="mt-3 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
               {submitError}
             </p>
           )}
@@ -171,7 +171,7 @@ export function ReturnFlow({
               <select
                 value={refundMethod}
                 onChange={(e) => setRefundMethod(e.target.value as typeof refundMethod)}
-                className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-3 text-sm"
+                className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-3 text-sm"
               >
                 {REFUND_METHODS.map((m) => (
                   <option key={m.key} value={m.key}>

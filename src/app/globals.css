@@ -1,22 +1,95 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Design tokens.
+
+   Every colour is a CSS variable so a theme switch is a variable swap rather
+   than a rewrite of component classes. Two rules make that work:
+
+   - `brand-purple` is the interactive SURFACE colour (buttons), which always
+     carries white text. `brand-accent` is purple used as FOREGROUND (links,
+     icons, chip text). They diverge in dark mode: a purple light enough to
+     read on a dark background is too light to sit under white button text.
+   - `brand-surface` replaces literal `bg-white`, which cannot follow a theme.
+
+   Contrast targets are WCAG AA (4.5:1 body text, 3:1 large/UI).
+--------------------------------------------------------------------------- */
+
 :root {
+  color-scheme: light;
+
   --background: #f7f7fa;
   --foreground: #0a0a0a;
 
-  /* Brand palette */
+  /* Brand palette — light */
   --color-brand-purple: #6d28d9;
   --color-brand-purple-bright: #7c3aed;
   --color-brand-purple-light: #ede9fe;
   --color-brand-purple-lightest: #f5f3ff;
+  --color-brand-accent: #6d28d9;
   --color-brand-black: #0a0a0a;
   --color-brand-sidebar: #111111;
   --color-brand-white: #ffffff;
+  --color-brand-surface: #ffffff;
+  --color-brand-surface-raised: #ffffff;
   --color-brand-bg: #f7f7fa;
   --color-brand-border: #e5e7eb;
   --color-brand-muted: #6b7280;
   --color-brand-success: #16a34a;
-  --color-brand-warning: #f59e0b;
+  --color-brand-warning: #b45309;
+  --color-brand-danger: #dc2626;
+}
+
+/* Dark theme. Applied by adding `.dark` to <html>; the inline script in the
+   app layout sets it before first paint so there is no flash of light UI. */
+.dark {
+  color-scheme: dark;
+
+  --background: #0b0b0f;
+  --foreground: #f4f4f5;
+
+  /* Purple stays the brand, but splits by role (see note above). */
+  --color-brand-purple: #7c3aed;
+  --color-brand-purple-bright: #8b5cf6;
+  --color-brand-purple-light: #2a2140;
+  --color-brand-purple-lightest: #1f1a2e;
+  --color-brand-accent: #c4b5fd;
+  --color-brand-black: #f4f4f5;
+  --color-brand-sidebar: #08080b;
+  --color-brand-white: #16161c;
+  --color-brand-surface: #16161c;
+  --color-brand-surface-raised: #1e1e26;
+  --color-brand-bg: #0b0b0f;
+  --color-brand-border: #2c2c36;
+  --color-brand-muted: #a1a1aa;
+  --color-brand-success: #4ade80;
+  --color-brand-warning: #fbbf24;
+  --color-brand-danger: #f87171;
+}
+
+/* The marketing site was designed as a light experience and is pinned to it,
+   so a visitor's OS preference doesn't invert a page built from fixed art. */
+.theme-light {
+  color-scheme: light;
+
+  --background: #f7f7fa;
+  --foreground: #0a0a0a;
+
+  --color-brand-purple: #6d28d9;
+  --color-brand-purple-bright: #7c3aed;
+  --color-brand-purple-light: #ede9fe;
+  --color-brand-purple-lightest: #f5f3ff;
+  --color-brand-accent: #6d28d9;
+  --color-brand-black: #0a0a0a;
+  --color-brand-sidebar: #111111;
+  --color-brand-white: #ffffff;
+  --color-brand-surface: #ffffff;
+  --color-brand-surface-raised: #ffffff;
+  --color-brand-bg: #f7f7fa;
+  --color-brand-border: #e5e7eb;
+  --color-brand-muted: #6b7280;
+  --color-brand-success: #16a34a;
+  --color-brand-warning: #b45309;
   --color-brand-danger: #dc2626;
 }
 
@@ -28,9 +101,12 @@
   --color-brand-purple-bright: var(--color-brand-purple-bright);
   --color-brand-purple-light: var(--color-brand-purple-light);
   --color-brand-purple-lightest: var(--color-brand-purple-lightest);
+  --color-brand-accent: var(--color-brand-accent);
   --color-brand-black: var(--color-brand-black);
   --color-brand-sidebar: var(--color-brand-sidebar);
   --color-brand-white: var(--color-brand-white);
+  --color-brand-surface: var(--color-brand-surface);
+  --color-brand-surface-raised: var(--color-brand-surface-raised);
   --color-brand-bg: var(--color-brand-bg);
   --color-brand-border: var(--color-brand-border);
   --color-brand-muted: var(--color-brand-muted);
@@ -52,6 +128,34 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Shadows read as dirt on dark surfaces; depth comes from the raised surface
+   token and borders instead. */
+.dark {
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-card-lg: 0 8px 24px -6px rgb(0 0 0 / 0.5);
+}
+
+/* A visible focus ring is the only way a keyboard user can tell where they
+   are. Never remove it — restyle it if it clashes. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-purple-bright);
+  outline-offset: 2px;
+}
+
+/* Honour the OS "reduce motion" setting. Vestibular disorders make sweeping
+   movement genuinely unpleasant, so animation becomes near-instant rather
+   than merely shorter. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer utilities {
   .font-display {
     font-family: var(--font-display), var(--font-sans), sans-serif;
@@ -61,5 +165,33 @@ body {
     background-image:
       radial-gradient(circle at 1px 1px, rgb(109 40 217 / 0.12) 1px, transparent 0);
     background-size: 24px 24px;
+  }
+
+  /* Skips straight to content, for keyboard and screen-reader users who would
+     otherwise tab through the whole sidebar on every page. */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+  }
+
+  /* Entry animation for lists and cards. Duration sits in the 150-300ms band
+     that reads as responsive rather than sluggish. */
+  @keyframes stockora-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .animate-fade-up {
+    animation: stockora-fade-up 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }

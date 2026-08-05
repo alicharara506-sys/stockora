@@ -75,7 +75,7 @@ export default async function InventoryPage({
         </div>
         <Link
           href="/inventory/history"
-          className="text-sm font-medium text-brand-purple hover:underline"
+          className="text-sm font-medium text-brand-accent hover:underline"
         >
           View movement history →
         </Link>
@@ -197,7 +197,7 @@ function SummaryCard({
           <p className="text-sm text-brand-muted">{label}</p>
           <p className="mt-1 font-display text-xl font-bold text-brand-black">{value}</p>
         </div>
-        <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+        <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
           <Icon className="size-5" />
         </div>
       </CardContent>

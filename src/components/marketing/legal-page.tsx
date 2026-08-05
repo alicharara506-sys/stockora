@@ -12,7 +12,7 @@ export function LegalPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="theme-light min-h-screen bg-white text-brand-black">
       <header className="border-b border-brand-border">
         <Container className="flex h-16 items-center">
           <Link href="/">

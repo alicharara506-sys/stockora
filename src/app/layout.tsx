@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
+import { THEME_INIT_SCRIPT } from "@/components/ui/theme-toggle";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,7 +29,13 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${poppins.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Applies the saved theme before the first paint, so a dark-mode
+            user never sees a white flash. Must stay inline and synchronous. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-black">
         {children}
       </body>

@@ -91,7 +91,7 @@ export function TargetsManager({
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -116,7 +116,7 @@ export function TargetsManager({
                 <select
                   value={draft.userId}
                   onChange={(e) => setDraft({ ...draft, userId: e.target.value })}
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   <option value="">Whole team</option>
                   {members.map((m) => (
@@ -133,7 +133,7 @@ export function TargetsManager({
                   onChange={(e) =>
                     setDraft({ ...draft, metric: e.target.value as (typeof METRICS)[number] })
                   }
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   {METRICS.map((m) => (
                     <option key={m} value={m}>
@@ -161,7 +161,7 @@ export function TargetsManager({
                   onChange={(e) =>
                     setDraft({ ...draft, period: e.target.value as (typeof PERIODS)[number] })
                   }
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   {PERIODS.map((p) => (
                     <option key={p} value={p}>
@@ -193,7 +193,7 @@ export function TargetsManager({
                 <select
                   value={draft.branchId}
                   onChange={(e) => setDraft({ ...draft, branchId: e.target.value })}
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   <option value="">All branches</option>
                   {branches.map((b) => (
@@ -208,7 +208,7 @@ export function TargetsManager({
                 <select
                   value={draft.categoryId}
                   onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   <option value="">All categories</option>
                   {categories.map((c) => (
@@ -234,7 +234,7 @@ export function TargetsManager({
       {targets.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
               <Target className="size-5" />
             </div>
             <p className="font-display text-sm font-semibold text-brand-black">No targets set</p>

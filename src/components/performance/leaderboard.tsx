@@ -16,12 +16,13 @@ function formatMetric(value: number, metric: TargetMetric) {
   return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-/** Medal tint for the top three; everyone else gets the neutral chip. */
+/** Medal tint for the top three; everyone else gets the neutral chip.
+ * Uses theme tokens with alpha so the medals stay legible on dark too. */
 function rankStyle(rank: number) {
-  if (rank === 1) return "bg-amber-100 text-amber-700";
-  if (rank === 2) return "bg-neutral-200 text-neutral-700";
-  if (rank === 3) return "bg-orange-100 text-orange-700";
-  return "bg-brand-purple-lightest text-brand-purple";
+  if (rank === 1) return "bg-brand-warning/20 text-brand-warning";
+  if (rank === 2) return "bg-brand-muted/20 text-brand-muted";
+  if (rank === 3) return "bg-brand-warning/10 text-brand-warning";
+  return "bg-brand-purple-lightest text-brand-accent";
 }
 
 export function Leaderboard({
@@ -35,7 +36,7 @@ export function Leaderboard({
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
             <Trophy className="size-5" />
           </div>
           <p className="font-display text-sm font-semibold text-brand-black">No sales in this period</p>
@@ -150,7 +151,7 @@ export function PerformanceSummary({
               <p className="text-xs font-medium uppercase tracking-wide text-brand-muted">
                 {card.label}
               </p>
-              <card.icon className="size-4 text-brand-purple" />
+              <card.icon className="size-4 text-brand-accent" />
             </div>
             <p className="mt-2 font-display text-2xl font-bold text-brand-black">{card.value}</p>
           </CardContent>

@@ -32,7 +32,7 @@ export function CartPanel({
   const total = Math.max(0, subtotal - discount);
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-brand-border bg-white">
+    <div className="flex h-full flex-col rounded-2xl border border-brand-border bg-brand-surface">
       <div className="flex items-center justify-between border-b border-brand-border p-4">
         <h2 className="font-display text-base font-semibold text-brand-black">Cart</h2>
         <CustomerPicker customers={customers} selectedId={selectedCustomerId} onSelect={onSelectCustomer} />

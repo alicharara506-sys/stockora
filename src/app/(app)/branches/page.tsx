@@ -34,7 +34,7 @@ export default async function BranchesPage() {
           <Card key={branch.id}>
             <CardContent className="space-y-3 p-5">
               <div className="flex items-start justify-between">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                   <Building2 className="size-5" />
                 </div>
                 <div className="flex gap-1.5">

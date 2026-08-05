@@ -61,7 +61,7 @@ export function ExchangeDialog({
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-card-lg">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-surface p-6 shadow-card-lg">
           <div className="flex items-center justify-between">
             <Dialog.Title className="font-display text-lg font-semibold text-brand-black">
               Exchange item
@@ -79,7 +79,7 @@ export function ExchangeDialog({
 
           <div className="mt-4 space-y-4">
             {error && (
-              <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+              <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
                 {error}
               </p>
             )}
@@ -88,7 +88,7 @@ export function ExchangeDialog({
               <select
                 value={newVariantId}
                 onChange={(e) => setNewVariantId(e.target.value)}
-                className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-3 text-sm"
+                className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-3 text-sm"
               >
                 {variantOptions.map((v) => (
                   <option key={v.id} value={v.id}>

@@ -57,10 +57,10 @@ export function ReceiveGoodsForm({
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-brand-border bg-white p-6">
+    <div className="space-y-4 rounded-2xl border border-brand-border bg-brand-surface p-6">
       <p className="font-display text-base font-semibold text-brand-black">Receive goods</p>
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -93,7 +93,7 @@ export function ReceiveGoodsForm({
                     type="checkbox"
                     checked={row.updateCostPrice}
                     onChange={(e) => updateRow(item.poItemId, { updateCostPrice: e.target.checked })}
-                    className="size-3.5 rounded border-brand-border text-brand-purple"
+                    className="size-3.5 rounded border-brand-border text-brand-accent"
                   />
                   Update product cost price
                 </label>

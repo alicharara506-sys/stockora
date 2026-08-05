@@ -49,7 +49,7 @@ export function CreateApiKeyDialog() {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-card-lg">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-surface p-6 shadow-card-lg">
           <div className="flex items-center justify-between">
             <Dialog.Title className="font-display text-lg font-semibold text-brand-black">
               {createdKey ? "Your new API key" : "Create API key"}
@@ -67,7 +67,7 @@ export function CreateApiKeyDialog() {
 
           {createdKey ? (
             <div className="mt-4 space-y-4">
-              <p className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-2.5 text-sm text-brand-warning">
+              <p className="rounded-xl border border-brand-warning/30 bg-brand-warning/10 px-4 py-2.5 text-sm text-brand-warning">
                 Copy this key now — it won&apos;t be shown again.
               </p>
               <div className="flex items-center gap-2 rounded-xl border border-brand-border bg-brand-bg p-3">
@@ -78,7 +78,7 @@ export function CreateApiKeyDialog() {
                     navigator.clipboard.writeText(createdKey);
                     setCopied(true);
                   }}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-brand-purple hover:bg-brand-purple-lightest"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-lg text-brand-accent hover:bg-brand-purple-lightest"
                   aria-label="Copy"
                 >
                   {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
@@ -91,7 +91,7 @@ export function CreateApiKeyDialog() {
           ) : (
             <form action={onSubmit} className="mt-4 space-y-4">
               {error && (
-                <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+                <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
                   {error}
                 </p>
               )}

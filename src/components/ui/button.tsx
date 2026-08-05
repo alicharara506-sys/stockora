@@ -4,7 +4,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  // cursor-pointer signals clickability; duration-200 sits in the 150-300ms
+  // band that reads as responsive without feeling laggy.
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -12,10 +14,10 @@ const buttonVariants = cva(
           "bg-brand-purple text-white shadow-card hover:bg-brand-purple-bright",
         dark: "bg-brand-black text-white hover:bg-neutral-800",
         outline:
-          "border border-brand-border bg-white text-brand-black hover:bg-brand-purple-lightest",
+          "border border-brand-border bg-brand-surface text-brand-black hover:bg-brand-purple-lightest",
         ghost: "text-brand-black hover:bg-brand-purple-lightest",
-        subtle: "bg-brand-purple-lightest text-brand-purple hover:bg-brand-purple-light",
-        link: "text-brand-purple underline-offset-4 hover:underline",
+        subtle: "bg-brand-purple-lightest text-brand-accent hover:bg-brand-purple-light",
+        link: "text-brand-accent underline-offset-4 hover:underline",
       },
       size: {
         sm: "h-9 px-3.5 text-xs",

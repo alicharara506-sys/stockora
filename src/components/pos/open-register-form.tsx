@@ -21,13 +21,13 @@ export function OpenRegisterForm({ registerId }: { registerId: string }) {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center">
-      <div className="w-full max-w-sm rounded-2xl border border-brand-border bg-white p-8 text-center shadow-card-lg">
+      <div className="w-full max-w-sm rounded-2xl border border-brand-border bg-brand-surface p-8 text-center shadow-card-lg">
         <h1 className="font-display text-xl font-bold text-brand-black">Open your register</h1>
         <p className="mt-1 text-sm text-brand-muted">
           Count the cash in your drawer before your first sale.
         </p>
         {error && (
-          <p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+          <p className="mt-4 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
             {error}
           </p>
         )}

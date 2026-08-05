@@ -21,7 +21,7 @@ export function ForgotPasswordForm() {
 
   if (message) {
     return (
-      <div className="rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-5 py-4 text-sm text-brand-purple">
+      <div className="rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-5 py-4 text-sm text-brand-accent">
         {message}
       </div>
     );

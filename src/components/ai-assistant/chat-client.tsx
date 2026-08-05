@@ -78,7 +78,7 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
               onClick={() => router.push(`/ai-assistant?conversation=${c.id}`)}
               className={`w-full truncate rounded-xl px-3 py-2.5 text-left text-sm transition-colors ${
                 c.id === activeConversationId
-                  ? "bg-brand-purple-lightest text-brand-purple font-medium"
+                  ? "bg-brand-purple-lightest text-brand-accent font-medium"
                   : "text-brand-black hover:bg-brand-purple-lightest/60"
               }`}
             >
@@ -122,7 +122,7 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
             if (message.role === "TOOL") {
               return (
                 <details key={message.id} className="mx-auto max-w-lg rounded-xl border border-brand-border bg-brand-purple-lightest/40 px-3 py-2 text-xs text-brand-muted">
-                  <summary className="cursor-pointer select-none font-medium text-brand-purple">
+                  <summary className="cursor-pointer select-none font-medium text-brand-accent">
                     <Wrench className="mr-1 inline size-3" />
                     Used {message.toolName}
                   </summary>
@@ -136,14 +136,14 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
               <div key={message.id} className={`flex items-start gap-2.5 ${isUser ? "flex-row-reverse" : ""}`}>
                 <div
                   className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
-                    isUser ? "bg-brand-black text-white" : "bg-brand-purple-lightest text-brand-purple"
+                    isUser ? "bg-brand-black text-white" : "bg-brand-purple-lightest text-brand-accent"
                   }`}
                 >
                   {isUser ? <User className="size-4" /> : <Bot className="size-4" />}
                 </div>
                 <div
                   className={`max-w-lg whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
-                    isUser ? "bg-brand-black text-white" : "border border-brand-border bg-white text-brand-black"
+                    isUser ? "bg-brand-black text-white" : "border border-brand-border bg-brand-surface text-brand-black"
                   }`}
                 >
                   {message.content}
@@ -154,10 +154,10 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
 
           {isPending && (
             <div className="flex items-center gap-2.5">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-purple">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-purple-lightest text-brand-accent">
                 <Bot className="size-4" />
               </div>
-              <div className="rounded-2xl border border-brand-border bg-white px-4 py-2.5 text-sm text-brand-muted">
+              <div className="rounded-2xl border border-brand-border bg-brand-surface px-4 py-2.5 text-sm text-brand-muted">
                 Thinking…
               </div>
             </div>
@@ -191,7 +191,7 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
               placeholder={activeConversationId ? "Ask about sales, inventory, or profit…" : "Start a new chat first"}
               disabled={!activeConversationId || isPending || limitReached}
               rows={2}
-              className="flex-1 resize-none rounded-xl border border-brand-border bg-white px-3.5 py-2.5 text-sm text-brand-black placeholder:text-brand-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright disabled:opacity-50"
+              className="flex-1 resize-none rounded-xl border border-brand-border bg-brand-surface px-3.5 py-2.5 text-sm text-brand-black placeholder:text-brand-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright disabled:opacity-50"
             />
             <Button
               type="submit"

@@ -46,7 +46,7 @@ export default async function ExpensesPage() {
               <p className="text-sm text-brand-muted">Total expenses</p>
               <p className="mt-1 font-display text-xl font-bold text-brand-black">${total.toFixed(2)}</p>
             </div>
-            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
               <Wallet className="size-5" />
             </div>
           </CardContent>

@@ -45,7 +45,7 @@ export default async function CustomerDetailPage({
       <div>
         <Link
           href="/customers"
-          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-purple"
+          className="mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-brand-muted hover:text-brand-accent"
         >
           <ArrowLeft className="size-4" />
           Back to customers
@@ -90,27 +90,27 @@ export default async function CustomerDetailPage({
         <CardContent className="grid gap-3 p-6 sm:grid-cols-2">
           {customer.phone && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
-              <Phone className="size-4 text-brand-purple" /> {customer.phone}
+              <Phone className="size-4 text-brand-accent" /> {customer.phone}
             </div>
           )}
           {customer.email && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
-              <Mail className="size-4 text-brand-purple" /> {customer.email}
+              <Mail className="size-4 text-brand-accent" /> {customer.email}
             </div>
           )}
           {customer.whatsapp && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
-              <MessageCircle className="size-4 text-brand-purple" /> {customer.whatsapp}
+              <MessageCircle className="size-4 text-brand-accent" /> {customer.whatsapp}
             </div>
           )}
           {customer.company && (
             <div className="flex items-center gap-2 text-sm text-brand-black">
-              <Building2 className="size-4 text-brand-purple" /> {customer.company}
+              <Building2 className="size-4 text-brand-accent" /> {customer.company}
             </div>
           )}
           {customer.address && (
             <div className="flex items-center gap-2 text-sm text-brand-black sm:col-span-2">
-              <MapPin className="size-4 text-brand-purple" /> {customer.address}
+              <MapPin className="size-4 text-brand-accent" /> {customer.address}
             </div>
           )}
           {customer.tags.length > 0 && (
@@ -146,7 +146,7 @@ export default async function CustomerDetailPage({
                   {sales.map((sale) => (
                     <tr key={sale.id} className="border-b border-brand-border last:border-0">
                       <td className="px-5 py-3">
-                        <Link href={`/sales/${sale.id}`} className="font-medium text-brand-black hover:text-brand-purple">
+                        <Link href={`/sales/${sale.id}`} className="font-medium text-brand-black hover:text-brand-accent">
                           {sale.saleNumber}
                         </Link>
                       </td>

@@ -49,9 +49,9 @@ export function CreatePoForm({
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-brand-border bg-white p-6">
+    <div className="space-y-4 rounded-2xl border border-brand-border bg-brand-surface p-6">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -61,7 +61,7 @@ export function CreatePoForm({
           <select
             value={supplierId}
             onChange={(e) => setSupplierId(e.target.value)}
-            className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-3 text-sm"
+            className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-3 text-sm"
           >
             {suppliers.map((s) => (
               <option key={s.id} value={s.id}>
@@ -75,7 +75,7 @@ export function CreatePoForm({
           <select
             value={locationId}
             onChange={(e) => setLocationId(e.target.value)}
-            className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-3 text-sm"
+            className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-3 text-sm"
           >
             {locations.map((l) => (
               <option key={l.id} value={l.id}>
@@ -104,7 +104,7 @@ export function CreatePoForm({
                 const variant = variants.find((v) => v.id === e.target.value);
                 updateItem(index, { variantId: e.target.value, unitCost: String(variant?.costPrice ?? 0) });
               }}
-              className="h-10 flex-1 rounded-lg border border-brand-border bg-white px-2.5 text-xs"
+              className="h-10 flex-1 rounded-lg border border-brand-border bg-brand-surface px-2.5 text-xs"
             >
               {variants.map((v) => (
                 <option key={v.id} value={v.id}>
@@ -133,7 +133,7 @@ export function CreatePoForm({
               type="button"
               onClick={() => setItems((prev) => prev.filter((_, i) => i !== index))}
               disabled={items.length === 1}
-              className="flex size-10 items-center justify-center rounded-lg text-brand-muted hover:bg-red-50 hover:text-brand-danger disabled:opacity-40"
+              className="flex size-10 items-center justify-center rounded-lg text-brand-muted hover:bg-brand-danger/10 hover:text-brand-danger disabled:opacity-40"
             >
               <Trash2 className="size-4" />
             </button>

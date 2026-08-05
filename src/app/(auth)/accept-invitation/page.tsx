@@ -61,7 +61,7 @@ function StatusCard({ heading, body }: { heading: string; body: string }) {
   return (
     <div>
       <h1 className="font-display text-2xl font-bold text-brand-black">{heading}</h1>
-      <p className="mt-4 rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-sm text-brand-danger">
+      <p className="mt-4 rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-5 py-4 text-sm text-brand-danger">
         {body}
       </p>
     </div>

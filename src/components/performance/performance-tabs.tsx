@@ -16,7 +16,7 @@ export function PerformanceTabs({
 }) {
   return (
     <Tabs.Root defaultValue="leaderboard">
-      <Tabs.List className="inline-flex flex-wrap gap-1 rounded-full border border-brand-border bg-white p-1">
+      <Tabs.List className="inline-flex flex-wrap gap-1 rounded-full border border-brand-border bg-brand-surface p-1">
         <TabTrigger value="leaderboard">Leaderboard</TabTrigger>
         <TabTrigger value="targets">Targets</TabTrigger>
         <TabTrigger value="rules">Commission rules</TabTrigger>

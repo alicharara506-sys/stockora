@@ -46,7 +46,7 @@ export function InlineCreatableSelect({
         <button
           type="button"
           onClick={() => setCreating((v) => !v)}
-          className="flex items-center gap-1 text-xs font-medium text-brand-purple hover:underline"
+          className="flex items-center gap-1 text-xs font-medium text-brand-accent hover:underline"
         >
           <Plus className="size-3.5" />
           New
@@ -74,7 +74,7 @@ export function InlineCreatableSelect({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+          className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
         >
           <option value="">None</option>
           {items.map((item) => (

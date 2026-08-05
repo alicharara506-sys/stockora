@@ -39,7 +39,7 @@ export function CreateBusinessForm() {
   return (
     <form action={onSubmit} className="space-y-5">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-3 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -53,7 +53,7 @@ export function CreateBusinessForm() {
           id="industry"
           name="industry"
           required
-          className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+          className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
         >
           <option value="">Select an industry</option>
           {INDUSTRIES.map((industry) => (
@@ -70,7 +70,7 @@ export function CreateBusinessForm() {
           name="baseCurrency"
           required
           defaultValue="USD"
-          className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+          className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
         >
           {CURRENCIES.map((currency) => (
             <option key={currency} value={currency}>

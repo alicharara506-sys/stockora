@@ -67,7 +67,7 @@ function PermissionCheckbox({
         value={value}
         defaultChecked={defaultChecked}
         disabled={disabled}
-        className="size-4 rounded border-brand-border text-brand-purple focus:ring-brand-purple-bright"
+        className="size-4 rounded border-brand-border text-brand-accent focus:ring-brand-purple-bright"
       />
       {label}
     </label>

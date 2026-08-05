@@ -91,7 +91,7 @@ export default async function EmployeesPage() {
             {invitations.map((invitation) => (
               <Card key={invitation.id}>
                 <CardContent className="flex items-center gap-3 p-4">
-                  <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                     <Users className="size-4" />
                   </div>
                   <div className="min-w-0">

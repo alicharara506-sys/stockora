@@ -82,7 +82,7 @@ export default async function IntegrationsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Plug className="size-4 text-brand-purple" />
+            <Plug className="size-4 text-brand-accent" />
             <CardTitle>API reference</CardTitle>
           </div>
           <CardDescription>The public REST API, versioned at /api/v1.</CardDescription>

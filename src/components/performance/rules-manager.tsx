@@ -104,7 +104,7 @@ export function RulesManager({
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -138,7 +138,7 @@ export function RulesManager({
                   onChange={(e) =>
                     setDraft({ ...draft, kind: e.target.value as CommissionKind })
                   }
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   <option value="COMMISSION">Commission — earned on sales</option>
                   <option value="BONUS">Bonus — paid when a target is met</option>
@@ -152,7 +152,7 @@ export function RulesManager({
                   onChange={(e) =>
                     setDraft({ ...draft, basis: e.target.value as (typeof BASES)[number] })
                   }
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   {BASES.map((b) => (
                     <option key={b} value={b}>
@@ -180,7 +180,7 @@ export function RulesManager({
                 <select
                   value={draft.userId}
                   onChange={(e) => setDraft({ ...draft, userId: e.target.value })}
-                  className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm"
+                  className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm"
                 >
                   <option value="">Everyone</option>
                   {members.map((m) => (
@@ -228,7 +228,7 @@ export function RulesManager({
       {rules.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
-            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
               <Percent className="size-5" />
             </div>
             <p className="font-display text-sm font-semibold text-brand-black">No commission rules</p>
@@ -246,7 +246,7 @@ export function RulesManager({
                 <CardContent className="space-y-3 p-5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+                      <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                         <Icon className="size-4" />
                       </div>
                       <div>

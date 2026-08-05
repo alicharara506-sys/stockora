@@ -99,7 +99,7 @@ export default async function DashboardPage() {
             Signed in as <span className="font-medium text-brand-black">{context.role.name}</span>.
           </p>
         </div>
-        <Link href="/reports" className="text-sm font-medium text-brand-purple hover:underline">
+        <Link href="/reports" className="text-sm font-medium text-brand-accent hover:underline">
           View full reports
         </Link>
       </div>
@@ -122,7 +122,7 @@ export default async function DashboardPage() {
                   </p>
                 )}
               </div>
-              <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+              <div className="flex size-11 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                 <stat.icon className="size-5" />
               </div>
             </CardContent>

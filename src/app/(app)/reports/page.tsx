@@ -58,7 +58,7 @@ export default async function ReportsPage({
                 <p className="text-sm text-brand-muted">{card.label}</p>
                 <p className="mt-1 font-display text-lg font-bold text-brand-black">{card.value}</p>
               </div>
-              <div className="flex size-10 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                 <card.icon className="size-4" />
               </div>
             </CardContent>

@@ -62,14 +62,14 @@ export function ReportFilters({ branches }: ReportFiltersProps) {
               type="date"
               value={customFrom}
               onChange={(e) => setCustomFrom(e.target.value)}
-              className="h-9 rounded-xl border border-brand-border bg-white px-3 text-xs text-brand-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+              className="h-9 rounded-xl border border-brand-border bg-brand-surface px-3 text-xs text-brand-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
             />
             <span className="text-xs text-brand-muted">to</span>
             <input
               type="date"
               value={customTo}
               onChange={(e) => setCustomTo(e.target.value)}
-              className="h-9 rounded-xl border border-brand-border bg-white px-3 text-xs text-brand-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+              className="h-9 rounded-xl border border-brand-border bg-brand-surface px-3 text-xs text-brand-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
             />
             <Button
               type="button"
@@ -88,7 +88,7 @@ export function ReportFilters({ branches }: ReportFiltersProps) {
             value={branchId}
             disabled={isPending}
             onChange={(e) => applyParams({ branchId: e.target.value || undefined })}
-            className="h-9 rounded-xl border border-brand-border bg-white px-3 text-xs text-brand-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+            className="h-9 rounded-xl border border-brand-border bg-brand-surface px-3 text-xs text-brand-black focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
           >
             <option value="">All branches</option>
             {branches.map((branch) => (

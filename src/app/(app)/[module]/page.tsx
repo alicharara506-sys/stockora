@@ -20,7 +20,7 @@ export default async function ModulePage({
     <div className="flex min-h-[60vh] items-center justify-center">
       <Card className="max-w-md text-center">
         <CardContent className="flex flex-col items-center gap-4 p-10">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-purple-lightest text-brand-purple">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-brand-purple-lightest text-brand-accent">
             <Icon className="size-6" />
           </div>
           <h1 className="font-display text-xl font-bold text-brand-black">{item.label}</h1>

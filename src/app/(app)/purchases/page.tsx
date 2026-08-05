@@ -63,7 +63,7 @@ export default async function PurchasesPage() {
                 {purchaseOrders.map((po) => (
                   <tr key={po.id} className="border-b border-brand-border last:border-0">
                     <td className="px-5 py-3">
-                      <Link href={`/purchases/${po.id}`} className="font-medium text-brand-black hover:text-brand-purple">
+                      <Link href={`/purchases/${po.id}`} className="font-medium text-brand-black hover:text-brand-accent">
                         {po.poNumber}
                       </Link>
                     </td>

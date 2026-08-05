@@ -11,7 +11,7 @@ export default async function PosPage() {
   const register = await ensureMainRegister(context.business.id);
   if (!register) {
     return (
-      <div className="rounded-2xl border border-brand-border bg-white p-8 text-center text-sm text-brand-muted">
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-8 text-center text-sm text-brand-muted">
         Set up a main branch before using the POS.
       </div>
     );

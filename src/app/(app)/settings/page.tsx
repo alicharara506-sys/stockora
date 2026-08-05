@@ -152,7 +152,7 @@ export default async function SettingsPage() {
                     <CardContent className="space-y-3 p-5">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+                          <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
                             <ShieldCheck className="size-4" />
                           </div>
                           <p className="font-display text-sm font-semibold text-brand-black">

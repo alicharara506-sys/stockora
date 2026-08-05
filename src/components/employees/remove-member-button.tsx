@@ -32,7 +32,7 @@ export function RemoveMemberButton({ membershipId }: { membershipId: string }) {
         type="button"
         onClick={onClick}
         disabled={isPending}
-        className="flex items-center gap-1.5 rounded-lg border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-danger hover:bg-red-50 disabled:opacity-50"
+        className="flex items-center gap-1.5 rounded-lg border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-danger hover:bg-brand-danger/10 disabled:opacity-50"
       >
         <UserMinus className="size-3.5" />
         {isPending ? "Removing…" : "Remove"}

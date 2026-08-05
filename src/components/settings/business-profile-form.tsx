@@ -46,12 +46,12 @@ export function BusinessProfileForm({
   return (
     <form action={onSubmit} className="max-w-md space-y-4">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
       {saved && (
-        <p className="rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-4 py-2.5 text-sm text-brand-purple">
+        <p className="rounded-xl border border-brand-purple-light bg-brand-purple-lightest px-4 py-2.5 text-sm text-brand-accent">
           Saved.
         </p>
       )}
@@ -66,7 +66,7 @@ export function BusinessProfileForm({
           name="industry"
           defaultValue={industry ?? ""}
           required
-          className="flex h-11 w-full rounded-xl border border-brand-border bg-white px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
+          className="flex h-11 w-full rounded-xl border border-brand-border bg-brand-surface px-4 text-sm text-brand-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright"
         >
           {INDUSTRIES.map((option) => (
             <option key={option} value={option}>

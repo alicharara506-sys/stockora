@@ -88,7 +88,7 @@ export function SizeChartManager({ sizeCharts }: { sizeCharts: SizeChart[] }) {
   return (
     <div className="space-y-5">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
@@ -161,7 +161,7 @@ function SizeChartCard({
       <CardContent className="space-y-3 p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-purple">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-brand-purple-lightest text-brand-accent">
               <Ruler className="size-4" />
             </div>
             {renaming ? (
@@ -171,7 +171,7 @@ function SizeChartCard({
                   type="button"
                   onClick={submitRename}
                   disabled={isRenamePending}
-                  className="text-brand-purple hover:text-brand-purple-bright"
+                  className="text-brand-accent hover:text-brand-purple-bright"
                 >
                   <Check className="size-4" />
                 </button>
@@ -203,7 +203,7 @@ function SizeChartCard({
           {chart.values.map((v) => (
             <span
               key={v.id}
-              className="flex items-center gap-1.5 rounded-full border border-brand-border bg-white px-3 py-1 text-xs text-brand-black"
+              className="flex items-center gap-1.5 rounded-full border border-brand-border bg-brand-surface px-3 py-1 text-xs text-brand-black"
             >
               {v.value}
               <button

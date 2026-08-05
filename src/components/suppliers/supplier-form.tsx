@@ -53,9 +53,9 @@ export function SupplierForm({
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border border-brand-border bg-white p-6">
+    <div className="space-y-4 rounded-2xl border border-brand-border bg-brand-surface p-6">
       {error && (
-        <p className="rounded-xl border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-brand-danger">
+        <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/10 px-4 py-2.5 text-sm text-brand-danger">
           {error}
         </p>
       )}
