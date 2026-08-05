@@ -14,6 +14,7 @@ import { CancelSubscriptionButton } from "@/components/settings/cancel-subscript
 import { CategoryManager } from "@/components/settings/catalog/category-manager";
 import { SizeChartManager } from "@/components/settings/catalog/size-chart-manager";
 import { AttributeManager } from "@/components/settings/catalog/attribute-manager";
+import { TaxManager } from "@/components/settings/tax/tax-manager";
 
 function groupPermissions() {
   const groups = new Map<string, { group: string; permissions: typeof PERMISSION_DEFINITIONS }>();
@@ -66,6 +67,15 @@ export default async function SettingsPage() {
         orderBy: { name: "asc" },
       }),
     ]);
+
+  const [businessSetting, taxRules] = await Promise.all([
+    prisma.businessSetting.findUnique({ where: { businessId: context.business.id } }),
+    prisma.tax.findMany({
+      where: { businessId: context.business.id },
+      include: { _count: { select: { products: true, variants: true } } },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -200,6 +210,34 @@ export default async function SettingsPage() {
             </div>
           ) : (
             <p className="text-sm text-brand-muted">You don&apos;t have permission to manage the catalog.</p>
+          )
+        }
+        tax={
+          canManage ? (
+            <TaxManager
+              settings={{
+                taxEnabled: businessSetting?.taxEnabled ?? false,
+                pricesIncludeTax: businessSetting?.pricesIncludeTax ?? false,
+                taxCountry: businessSetting?.taxCountry ?? null,
+                taxRegistrationNumber: businessSetting?.taxRegistrationNumber ?? null,
+              }}
+              rules={taxRules.map((rule) => ({
+                id: rule.id,
+                name: rule.name,
+                rate: Number(rule.rate),
+                system: rule.system,
+                treatment: rule.treatment,
+                isCompound: rule.isCompound,
+                country: rule.country,
+                isDefault: rule.isDefault,
+                isActive: rule.isActive,
+                usageCount: rule._count.products + rule._count.variants,
+              }))}
+            />
+          ) : (
+            <p className="text-sm text-brand-muted">
+              You don&apos;t have permission to change tax settings.
+            </p>
           )
         }
         billing={

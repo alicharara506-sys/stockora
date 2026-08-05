@@ -430,6 +430,9 @@ model Supplier {
   email         String?
   address       String?
   taxNumber     String?
+  /// Purchases from this supplier are reverse-charged: they invoice without
+  /// tax and this business self-accounts for it.
+  reverseCharge Boolean  @default(false)
   contactPerson String?
   balance       Decimal  @default(0) @db.Decimal(14, 2)
   notes         String?
@@ -493,19 +496,47 @@ model SizeChartValue {
   @@unique([sizeChartId, value])
 }
 
+enum TaxSystem {
+  VAT
+  GST
+  SALES_TAX
+  CONSUMPTION_TAX
+  CUSTOM
+}
+
+/// STANDARD charges the rate. ZERO_RATED is in scope but charged at 0% and
+/// still reported. EXEMPT is out of scope entirely. REVERSE_CHARGE means the
+/// buyer self-accounts, so the seller charges nothing but must disclose it.
+enum TaxTreatment {
+  STANDARD
+  ZERO_RATED
+  EXEMPT
+  REVERSE_CHARGE
+}
+
 model Tax {
-  id         String   @id @default(cuid())
+  id         String       @id @default(cuid())
   businessId String
   name       String
-  rate       Decimal  @db.Decimal(6, 3)
-  isDefault  Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  rate       Decimal      @db.Decimal(6, 3)
+  system     TaxSystem    @default(VAT)
+  treatment  TaxTreatment @default(STANDARD)
+  /// Compound taxes apply on top of the net plus preceding taxes, not the net
+  /// alone (e.g. a provincial tax stacked on a federal one).
+  isCompound Boolean      @default(false)
+  /// ISO country code this rule belongs to, for multi-country businesses.
+  country    String?
+  isActive   Boolean      @default(true)
+  sortOrder  Int          @default(0)
+  isDefault  Boolean      @default(false)
+  createdAt  DateTime     @default(now())
 
   business Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
   products Product[]
   variants ProductVariant[]
 
   @@unique([businessId, name])
+  @@index([businessId, isActive])
 }
 
 // ---------------------------------------------------------------------------
@@ -831,6 +862,10 @@ model Customer {
   lastPurchaseAt     DateTime?
   preferredBranchId  String?
   marketingConsent   Boolean   @default(false)
+  /// Exempts this customer from tax regardless of product rules (e.g. a
+  /// diplomatic or registered-export buyer). Requires taxNumber on file.
+  taxExempt          Boolean   @default(false)
+  taxNumber          String?
   createdAt          DateTime  @default(now())
 
   business Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -912,6 +947,12 @@ model Sale {
   discountTotal     Decimal    @default(0) @db.Decimal(14, 2)
   taxTotal          Decimal    @default(0) @db.Decimal(14, 2)
   total             Decimal    @db.Decimal(14, 2)
+  /// Whether the prices on this sale already contained tax, captured at the
+  /// time of sale so a reprint reflects the rules then in force.
+  pricesIncludedTax Boolean    @default(false)
+  /// Per-rule tax breakdown as charged, frozen for reprints and tax returns:
+  /// [{ taxId, name, rate, treatment, amount }].
+  taxBreakdown      Json       @default("[]")
   status            SaleStatus @default(COMPLETED)
   notes             String?
   createdAt         DateTime   @default(now())
@@ -1528,6 +1569,17 @@ model BusinessSetting {
   returnPolicyDays     Int     @default(14)
   negativeStockAllowed Boolean @default(false)
   roundingRule         String  @default("NEAREST_CENT")
+
+  /// Taxation is opt-in. While false, every tax calculation short-circuits to
+  /// zero and totals behave exactly as they did before the tax engine existed.
+  taxEnabled            Boolean @default(false)
+  /// Whether catalog prices already contain tax (extract it) or exclude it
+  /// (add it on top at checkout).
+  pricesIncludeTax      Boolean @default(false)
+  /// ISO country code driving the default tax rules for this business.
+  taxCountry            String?
+  /// VAT/GST registration number printed on invoices and receipts.
+  taxRegistrationNumber String?
 
   business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }

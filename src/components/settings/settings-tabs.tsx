@@ -7,11 +7,13 @@ export function SettingsTabs({
   general,
   roles,
   catalog,
+  tax,
   billing,
 }: {
   general: React.ReactNode;
   roles: React.ReactNode;
   catalog: React.ReactNode;
+  tax: React.ReactNode;
   billing: React.ReactNode;
 }) {
   return (
@@ -20,6 +22,7 @@ export function SettingsTabs({
         <TabTrigger value="general">General</TabTrigger>
         <TabTrigger value="roles">Roles &amp; Permissions</TabTrigger>
         <TabTrigger value="catalog">Catalog</TabTrigger>
+        <TabTrigger value="tax">Tax</TabTrigger>
         <TabTrigger value="billing">Billing</TabTrigger>
       </Tabs.List>
       <Tabs.Content value="general" className="mt-6">
@@ -30,6 +33,9 @@ export function SettingsTabs({
       </Tabs.Content>
       <Tabs.Content value="catalog" className="mt-6">
         {catalog}
+      </Tabs.Content>
+      <Tabs.Content value="tax" className="mt-6">
+        {tax}
       </Tabs.Content>
       <Tabs.Content value="billing" className="mt-6">
         {billing}

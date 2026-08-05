@@ -6,6 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/tenancy";
 import { checkoutSchema } from "@/lib/validation/pos";
 import { applyInventoryMovement, InsufficientStockError } from "@/server/services/inventory";
+import { loadTaxContext, resolveRules } from "@/lib/tax/resolve";
+import { calculateCartTax } from "@/lib/tax/calculate";
+import { allocateCents, toCents, toMajor } from "@/lib/money";
 
 export type CheckoutResult = { success: true; saleId: string } | { success: false; error: string };
 
@@ -43,13 +46,48 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
     return { success: false, error: "Customer not found." };
   }
 
-  const variants = await prisma.productVariant.findMany({
-    where: { id: { in: data.items.map((i) => i.variantId) }, businessId: context.business.id },
-  });
+  const [variants, taxContext] = await Promise.all([
+    prisma.productVariant.findMany({
+      where: { id: { in: data.items.map((i) => i.variantId) }, businessId: context.business.id },
+      include: { product: { select: { taxId: true } } },
+    }),
+    loadTaxContext(context.business.id),
+  ]);
   const variantById = new Map(variants.map((v) => [v.id, v]));
 
+  // Spread the order-level discount across lines by value, so tax is charged
+  // on what each line actually cost. allocateCents guarantees the parts sum to
+  // the discount exactly — no cent lost or invented.
+  const lineGrossCents = data.items.map((item) => toCents(item.unitPrice * item.quantity));
+  const discountPerLine = allocateCents(toCents(data.discountTotal), lineGrossCents);
+
+  const taxed = calculateCartTax(
+    data.items.map((item, index) => {
+      const variant = variantById.get(item.variantId);
+      return {
+        key: item.variantId,
+        unitPrice: item.unitPrice,
+        quantity: item.quantity,
+        discountAmount: toMajor(discountPerLine[index]),
+        rules: resolveRules(
+          taxContext,
+          { variantTaxId: variant?.taxId, productTaxId: variant?.product.taxId },
+          { customerExempt: customer?.taxExempt ?? false },
+        ),
+      };
+    }),
+    taxContext.pricesIncludeTax,
+  );
+
+  // subtotal keeps its existing meaning: line prices before discount.
   const subtotal = data.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-  const total = Math.max(0, subtotal - data.discountTotal);
+  const taxTotal = taxed.taxTotal;
+
+  // calculateCartTax already returns the customer-facing gross for both
+  // pricing modes — adding taxTotal here would double-count it on
+  // tax-inclusive prices. With tax off this equals subtotal - discountTotal,
+  // exactly the previous arithmetic.
+  const total = Math.max(0, taxed.total);
 
   if (data.paymentMethod === "STORE_CREDIT") {
     if (!customer) return { success: false, error: "Select a customer to pay with store credit." };
@@ -73,15 +111,21 @@ export async function checkoutAction(input: unknown): Promise<CheckoutResult> {
           currency: context.business.baseCurrency,
           subtotal,
           discountTotal: data.discountTotal,
-          taxTotal: 0,
+          taxTotal,
           total,
+          pricesIncludedTax: taxContext.pricesIncludeTax,
+          taxBreakdown: taxed.summary,
           status: "COMPLETED",
           notes: data.notes || null,
           items: {
-            create: data.items.map((item) => ({
+            create: data.items.map((item, index) => ({
               variantId: item.variantId,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
+              discountAmount: toMajor(discountPerLine[index]),
+              // taxed.lines preserves input order, so index-match rather than
+              // keying by variantId — the same variant can appear twice.
+              taxAmount: taxed.lines[index]?.tax ?? 0,
               lineTotal: item.unitPrice * item.quantity,
             })),
           },
