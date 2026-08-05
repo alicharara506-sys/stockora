@@ -1,0 +1,30 @@
+# Local PostgreSQL for development.
+#
+#   docker compose up -d
+#
+# Gives you a database matching the DATABASE_URL in .env.example, so the only
+# other thing you need locally is Node. Data survives restarts in the named
+# volume below; `docker compose down -v` wipes it if you want a clean slate.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: stockora-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stockora
+    ports:
+      - "5432:5432"
+    volumes:
+      - stockora-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Lets `docker compose up --wait` block until the database really
+      # accepts connections, rather than just until the container starts.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stockora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  stockora-pgdata:
