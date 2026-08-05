@@ -6,16 +6,36 @@ export interface ResolvedRange {
   to: Date;
 }
 
-function startOfDay(date: Date) {
+export function startOfDay(date: Date) {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
 }
 
-function endOfDay(date: Date) {
+export function endOfDay(date: Date) {
   const d = new Date(date);
   d.setHours(23, 59, 59, 999);
   return d;
+}
+
+/**
+ * Turns two "YYYY-MM-DD" strings into a range covering both days in full.
+ *
+ * `new Date("2026-08-05")` is midnight, so using it as an upper bound drops
+ * everything that happened during that day — on a payroll period that means
+ * the last day's sales earn no commission at all.
+ */
+export function parseDayRange(
+  from: string,
+  to: string,
+): { from: Date; to: Date } | null {
+  const start = new Date(from);
+  const end = new Date(to);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+
+  const range = { from: startOfDay(start), to: endOfDay(end) };
+  if (range.to < range.from) return null;
+  return range;
 }
 
 export function resolveDateRange(params: {

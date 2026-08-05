@@ -41,6 +41,16 @@ npm run start               # or let your host's Next.js runtime start the serve
 `prisma migrate deploy` (not `migrate dev`) is the one to run in CI/CD — it never generates a new
 migration or prompts, it only applies what's already committed under `prisma/migrations/`.
 
+After a release that introduces new permissions, also run:
+
+```bash
+npm run db:sync-permissions
+```
+
+System roles are seeded once when a business signs up, so existing tenants keep their old grants
+until this runs — new screens stay invisible to them otherwise. It only rewrites system roles
+(Owner, Admin, Manager, ...); custom roles a business created are left untouched.
+
 Seeding (`npx prisma db seed`) is a local/demo convenience (creates the demo business, system
 roles, and plans) — don't run it against a production database that already has real tenants.
 

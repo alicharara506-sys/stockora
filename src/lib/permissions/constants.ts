@@ -16,6 +16,8 @@ export const PERMISSIONS = {
   MANAGE_EMPLOYEES: "manage_employees",
   MANAGE_SUBSCRIPTIONS: "manage_subscriptions",
   CHANGE_SETTINGS: "change_settings",
+  VIEW_PERFORMANCE: "view_performance",
+  MANAGE_COMMISSION: "manage_commission",
 } as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -38,6 +40,8 @@ export const PERMISSION_DEFINITIONS: { key: PermissionKey; label: string; group:
   { key: PERMISSIONS.MANAGE_EMPLOYEES, label: "Manage employees", group: "Team" },
   { key: PERMISSIONS.MANAGE_SUBSCRIPTIONS, label: "Manage subscriptions", group: "Billing" },
   { key: PERMISSIONS.CHANGE_SETTINGS, label: "Change settings", group: "Settings" },
+  { key: PERMISSIONS.VIEW_PERFORMANCE, label: "View performance", group: "Performance" },
+  { key: PERMISSIONS.MANAGE_COMMISSION, label: "Manage targets & commission", group: "Performance" },
 ];
 
 export const SYSTEM_ROLES = {
@@ -78,6 +82,8 @@ export const SYSTEM_ROLE_DEFINITIONS: Record<
       PERMISSIONS.TRANSFER_STOCK,
       PERMISSIONS.VIEW_REPORTS,
       PERMISSIONS.MANAGE_EMPLOYEES,
+      PERMISSIONS.VIEW_PERFORMANCE,
+      PERMISSIONS.MANAGE_COMMISSION,
     ],
   },
   [SYSTEM_ROLES.CASHIER]: {
@@ -106,10 +112,16 @@ export const SYSTEM_ROLE_DEFINITIONS: Record<
       PERMISSIONS.VIEW_COST_PRICE,
       PERMISSIONS.VIEW_PROFIT,
       PERMISSIONS.VIEW_REPORTS,
+      PERMISSIONS.VIEW_PERFORMANCE,
     ],
   },
   [SYSTEM_ROLES.SALESPERSON]: {
     name: "Salesperson",
-    permissions: [PERMISSIONS.APPLY_DISCOUNT, PERMISSIONS.OPEN_REGISTER, PERMISSIONS.CLOSE_REGISTER],
+    permissions: [
+      PERMISSIONS.APPLY_DISCOUNT,
+      PERMISSIONS.OPEN_REGISTER,
+      PERMISSIONS.CLOSE_REGISTER,
+      PERMISSIONS.VIEW_PERFORMANCE,
+    ],
   },
 };

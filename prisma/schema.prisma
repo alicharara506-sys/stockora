@@ -35,6 +35,10 @@ model User {
   notifications    Notification[]
   passwordResets   PasswordResetToken[]
   salesAsEmployee  Sale[]
+  salesTargets     SalesTarget[]
+  commissionRules  CommissionRule[]
+  commissionPayouts CommissionPayout[] @relation("PayoutEarner")
+  approvedPayouts  CommissionPayout[] @relation("PayoutApprover")
 }
 
 model Account {
@@ -154,6 +158,9 @@ model Business {
   exchangeRates      ExchangeRate[]
   invitations        Invitation[]
   apiKeys            ApiKey[]
+  salesTargets       SalesTarget[]
+  commissionRules    CommissionRule[]
+  commissionPayouts  CommissionPayout[]
 
   @@index([status])
 }
@@ -170,6 +177,9 @@ model BusinessMembership {
   userId     String
   roleId     String
   status     MembershipStatus @default(ACTIVE)
+  /// Largest discount this person may apply without an override. Null means
+  /// fall back to whatever their role permits.
+  maxDiscountPercent Decimal? @db.Decimal(5, 2)
   invitedAt  DateTime?
   joinedAt   DateTime?
   createdAt  DateTime         @default(now())
@@ -271,6 +281,8 @@ model Branch {
   branchAccess       BranchAccess[]
   sales              Sale[]
   expenses           Expense[]
+  salesTargets       SalesTarget[]
+  commissionRules    CommissionRule[]
 
   @@unique([businessId, code])
 }
@@ -404,6 +416,8 @@ model Category {
   children  Category[] @relation("CategoryToSubcategory")
   products  Product[]
   sizeChart SizeChart? @relation(fields: [sizeChartId], references: [id])
+  salesTargets    SalesTarget[]
+  commissionRules CommissionRule[]
 
   @@unique([businessId, name, parentId])
   @@index([sizeChartId])
@@ -602,8 +616,9 @@ model Product {
   supplier Supplier? @relation(fields: [supplierId], references: [id])
   tax      Tax?      @relation(fields: [taxId], references: [id])
 
-  images   ProductImage[]
-  variants ProductVariant[]
+  images       ProductImage[]
+  variants     ProductVariant[]
+  salesTargets SalesTarget[]
 
   @@index([businessId, status])
 }
@@ -1541,6 +1556,131 @@ model Notification {
   user     User?    @relation(fields: [userId], references: [id])
 
   @@index([businessId, userId, isRead])
+}
+
+enum TargetPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum TargetMetric {
+  REVENUE
+  UNITS
+  TRANSACTIONS
+  PROFIT
+}
+
+/// A goal for a salesperson, or for a whole branch when userId is null.
+/// Scope narrows by branch, category or product; leaving those null makes the
+/// target cover everything the person sells.
+model SalesTarget {
+  id          String       @id @default(cuid())
+  businessId  String
+  userId      String?
+  branchId    String?
+  categoryId  String?
+  productId   String?
+  period      TargetPeriod
+  metric      TargetMetric
+  targetValue Decimal      @db.Decimal(14, 2)
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean      @default(true)
+  notes       String?
+  createdAt   DateTime     @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch   Branch?   @relation(fields: [branchId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  product  Product?  @relation(fields: [productId], references: [id])
+
+  @@index([businessId, userId])
+  @@index([businessId, startsAt, endsAt])
+}
+
+enum CommissionKind {
+  COMMISSION
+  BONUS
+  PENALTY
+}
+
+enum CommissionBasis {
+  PERCENT_OF_REVENUE
+  PERCENT_OF_PROFIT
+  FIXED_PER_SALE
+  FIXED_PER_UNIT
+  FIXED_AMOUNT
+}
+
+/// How a salesperson earns. A rule with a null userId applies to everyone;
+/// naming a user overrides the general rule for that person.
+model CommissionRule {
+  id         String          @id @default(cuid())
+  businessId String
+  name       String
+  kind       CommissionKind  @default(COMMISSION)
+  basis      CommissionBasis
+  /// A percentage for PERCENT_* bases, otherwise a money amount.
+  value      Decimal         @db.Decimal(14, 4)
+  userId     String?
+  branchId   String?
+  categoryId String?
+  /// For BONUS and PENALTY: the share of target that triggers the rule.
+  /// A bonus fires at or above it; a penalty fires below it.
+  thresholdPercent Decimal?  @db.Decimal(6, 2)
+  isActive   Boolean         @default(true)
+  sortOrder  Int             @default(0)
+  createdAt  DateTime        @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch   Branch?   @relation(fields: [branchId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@unique([businessId, name])
+  @@index([businessId, isActive])
+}
+
+enum PayoutStatus {
+  DRAFT
+  APPROVED
+  PAID
+}
+
+/// A commission calculation frozen for one person over one period. Kept as a
+/// record rather than recomputed on demand so payroll history stays fixed
+/// even when rules or prices change afterwards.
+model CommissionPayout {
+  id               String       @id @default(cuid())
+  businessId       String
+  userId           String
+  periodStart      DateTime
+  periodEnd        DateTime
+  revenue          Decimal      @db.Decimal(14, 2)
+  unitsSold        Int          @default(0)
+  transactions     Int          @default(0)
+  grossProfit      Decimal      @default(0) @db.Decimal(14, 2)
+  commissionAmount Decimal      @default(0) @db.Decimal(14, 2)
+  bonusAmount      Decimal      @default(0) @db.Decimal(14, 2)
+  penaltyAmount    Decimal      @default(0) @db.Decimal(14, 2)
+  totalPayable     Decimal      @default(0) @db.Decimal(14, 2)
+  /// Per-rule detail as applied: [{ ruleId, name, kind, basis, amount }].
+  breakdown        Json         @default("[]")
+  status           PayoutStatus @default(DRAFT)
+  generatedAt      DateTime     @default(now())
+  approvedById     String?
+  paidAt           DateTime?
+
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user       User     @relation("PayoutEarner", fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy User?    @relation("PayoutApprover", fields: [approvedById], references: [id])
+
+  @@unique([businessId, userId, periodStart, periodEnd])
+  @@index([businessId, status])
 }
 
 model AuditLog {
