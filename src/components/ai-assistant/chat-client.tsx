@@ -22,6 +22,7 @@ interface ChatMessage {
 }
 
 interface ChatClientProps {
+  aiConfigured: boolean;
   conversations: ConversationSummary[];
   activeConversationId: string | null;
   messages: ChatMessage[];
@@ -35,7 +36,7 @@ const SUGGESTIONS = [
   "What's my gross profit this month?",
 ];
 
-export function ChatClient({ conversations, activeConversationId, messages, usage }: ChatClientProps) {
+export function ChatClient({ aiConfigured, conversations, activeConversationId, messages, usage }: ChatClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -51,12 +52,15 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
   }
 
   function handleSend(content: string) {
-    if (!activeConversationId || !content.trim() || limitReached) return;
+    if (!aiConfigured || !activeConversationId || !content.trim() || limitReached || isPending) return;
     setError(null);
     setDraft("");
     startTransition(async () => {
       const result = await sendMessageAction({ conversationId: activeConversationId, content });
-      if (!result.success) setError(result.error);
+      if (!result.success) {
+        setError(result.error);
+        setDraft(content);
+      }
       router.refresh();
     });
   }
@@ -92,6 +96,11 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
       </Card>
 
       <Card className="flex flex-col p-0">
+        {!aiConfigured && (
+          <p role="status" className="border-b border-brand-border px-6 py-4 text-sm text-brand-muted">
+            The AI assistant is not connected yet. Your workspace owner needs to connect Groq before you can send a message.
+          </p>
+        )}
         <div className="flex-1 space-y-4 overflow-y-auto p-6">
           {!activeConversationId && (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-brand-muted">
@@ -108,6 +117,7 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
                 {SUGGESTIONS.map((s) => (
                   <button
                     key={s}
+                    disabled={!aiConfigured || isPending || limitReached}
                     onClick={() => handleSend(s)}
                     className="rounded-full border border-brand-border px-3 py-1.5 text-xs text-brand-black hover:bg-brand-purple-lightest"
                   >
@@ -188,15 +198,15 @@ export function ChatClient({ conversations, activeConversationId, messages, usag
                   handleSend(draft);
                 }
               }}
-              placeholder={activeConversationId ? "Ask about sales, inventory, or profit…" : "Start a new chat first"}
-              disabled={!activeConversationId || isPending || limitReached}
+              placeholder={!aiConfigured ? "AI connection needed" : activeConversationId ? "Ask about sales, inventory, or profit…" : "Start a new chat first"}
+              disabled={!aiConfigured || !activeConversationId || isPending || limitReached}
               rows={2}
               className="flex-1 resize-none rounded-xl border border-brand-border bg-brand-surface px-3.5 py-2.5 text-sm text-brand-black placeholder:text-brand-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple-bright disabled:opacity-50"
             />
             <Button
               type="submit"
               size="icon"
-              disabled={!activeConversationId || !draft.trim() || isPending || limitReached}
+              disabled={!aiConfigured || !activeConversationId || !draft.trim() || isPending || limitReached}
             >
               <Send className="size-4" />
             </Button>

@@ -25,7 +25,8 @@ Copy `.env.example` and fill in every value below for a production deployment.
 | `AUTH_TRUST_HOST` | Yes, behind a proxy | Set to `true` when the app runs behind a reverse proxy or in a container (Docker, Fly, Railway, self-hosted). Without it, a production build rejects every request with `UntrustedHost` and login is impossible. Vercel sets this automatically, so it can be omitted there. |
 | `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Optional | Omit both to hide the Google login button. |
 | `RESEND_API_KEY` / `EMAIL_FROM` | Optional | Without a key, auth emails are logged server-side instead of sent — fine for a demo, not for real users. |
-| `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` | Optional | Without a key, the AI assistant chat still works but replies that it isn't connected. |
+| `GROQ_API_KEY` | Required for AI | Create a key at https://console.groq.com/keys. Keep the account on Groq's Free plan for quota-limited free inference. Without a key, chat displays a connection-needed message. |
+| `GROQ_MODEL` | Optional | Defaults to `openai/gpt-oss-120b`. Choose a model available to your Groq account. There is no automatic fallback to another provider. |
 
 Set these in your hosting provider's environment/secrets UI — never commit a filled-in `.env`.
 

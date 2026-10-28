@@ -2,6 +2,7 @@ import { requireBusinessContext } from "@/lib/tenancy";
 import { prisma } from "@/lib/prisma";
 import { getUsageStatus } from "@/lib/ai/usage";
 import { ChatClient } from "@/components/ai-assistant/chat-client";
+import { getAIProvider } from "@/lib/ai/provider";
 
 export default async function AiAssistantPage({
   searchParams,
@@ -32,6 +33,7 @@ export default async function AiAssistantPage({
 
   return (
     <ChatClient
+      aiConfigured={getAIProvider().isConfigured}
       conversations={conversations.map((c) => ({
         id: c.id,
         title: c.title ?? c.messages[0]?.content.slice(0, 60) ?? "New conversation",

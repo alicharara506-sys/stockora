@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireBusinessContext } from "@/lib/tenancy";
-import { getAIProvider } from "@/lib/ai/provider";
+import { AIProviderError, getAIProvider, type AITurnResult } from "@/lib/ai/provider";
 import { getToolSpecs, runTool } from "@/lib/ai/tools";
 import { getUsageStatus, recordUsage } from "@/lib/ai/usage";
 
@@ -48,6 +48,11 @@ export async function sendMessageAction(input: unknown): Promise<ActionResult> {
   });
   if (!conversation) return { success: false, error: "Conversation not found." };
 
+  const provider = getAIProvider();
+  if (!provider.isConfigured) {
+    return { success: false, error: "The AI assistant is not connected yet. Ask your workspace owner to connect Groq." };
+  }
+
   const usage = await getUsageStatus(context.business.id, context.userId);
   if (usage.remaining <= 0) {
     return {
@@ -56,29 +61,38 @@ export async function sendMessageAction(input: unknown): Promise<ActionResult> {
     };
   }
 
-  await prisma.aIMessage.create({
-    data: { conversationId, role: "USER", content },
-  });
-
   const priorMessages = await prisma.aIMessage.findMany({
     where: { conversationId, role: { in: ["USER", "ASSISTANT"] } },
-    orderBy: { createdAt: "asc" },
-    take: 20,
+    orderBy: { createdAt: "desc" },
+    take: 19,
   });
 
-  const provider = getAIProvider();
-  const result = await provider.runTurn({
-    systemPrompt: buildSystemPrompt(context.business.name, context.role.name),
-    history: priorMessages.map((m) => ({
-      role: m.role === "USER" ? "user" : "assistant",
-      content: m.content,
-    })),
-    tools: getToolSpecs(),
-    executeTool: (name, toolInput) =>
-      runTool(name, toolInput, { businessId: context.business.id, permissions: context.permissions }),
-  });
+  let result: AITurnResult;
+  try {
+    result = await provider.runTurn({
+      systemPrompt: buildSystemPrompt(context.business.name, context.role.name),
+      history: [
+        ...priorMessages.reverse().map((m) => ({
+          role: m.role === "USER" ? "user" as const : "assistant" as const,
+          content: m.content,
+        })),
+        { role: "user", content },
+      ],
+      tools: getToolSpecs(),
+      executeTool: (name, toolInput) =>
+        runTool(name, toolInput, { businessId: context.business.id, permissions: context.permissions }),
+    });
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof AIProviderError ? error.message : "The AI assistant could not respond. Please try again.",
+    };
+  }
 
   await prisma.$transaction([
+    prisma.aIMessage.create({
+      data: { conversationId, role: "USER", content },
+    }),
     ...result.toolCalls.map((call) =>
       prisma.aIMessage.create({
         data: {
@@ -95,9 +109,7 @@ export async function sendMessageAction(input: unknown): Promise<ActionResult> {
     }),
   ]);
 
-  if (provider.isConfigured) {
-    await recordUsage(context.business.id, context.userId, result.totalTokens);
-  }
+  await recordUsage(context.business.id, context.userId, result.totalTokens);
 
   revalidatePath("/ai-assistant");
   return { success: true };

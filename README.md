@@ -64,6 +64,28 @@ docker compose down -v   # stop and delete the data, for a clean re-seed
 See [`.env.example`](./.env.example) for the full list. `DATABASE_URL` and `AUTH_SECRET` are
 required; everything else (Google login, transactional email) degrades gracefully when unset.
 
+### Enable the AI assistant with Groq
+
+1. Create a free-plan Groq account and an API key at https://console.groq.com/keys.
+2. Set these values in the project's `.env` file (or your deployment's server secrets):
+
+   ```dotenv
+   GROQ_API_KEY="your-groq-key"
+   GROQ_MODEL="openai/gpt-oss-120b"
+   ```
+
+3. Restart the app, sign in, and open `/ai-assistant`. Start a new chat and ask
+   "Which variants are low on stock right now?" or "What were my sales this month?".
+   The assistant uses the current business's permission-checked tools to fetch its answers.
+
+Keep the key server-side; a filled-in `.env` must never be committed. Groq is the only AI
+provider: `ANTHROPIC_API_KEY` is no longer used, and requests never switch to a paid provider.
+Stockora cannot control your Groq account's billing tier, so keep it on the Free plan if you
+want zero inference charges. Free quotas are shared across the Groq organization, and one chat
+answer can require several API calls. See https://console.groq.com/docs/rate-limits for current
+limits. Rate-limit, connection, and authorization failures display an error, preserve the draft,
+and do not consume Stockora's monthly message allowance. Without a key, sending is disabled.
+
 ## Scripts
 
 | Script              | Purpose                                          |

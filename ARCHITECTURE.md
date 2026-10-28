@@ -162,10 +162,11 @@ uniqueness (e.g. a SKU unique per business, not globally) is enforced with compo
 
 ## 8. AI-assistant architecture (implemented — Phase 9)
 
-- A provider-agnostic interface (`src/lib/ai/provider.ts`) so the assistant can run on Anthropic
-  or another provider without touching call sites; the actual model call happens server-side
-  only (never expose a provider API key to the browser). Without `ANTHROPIC_API_KEY` set, it
-  degrades to an explanatory message instead of erroring, mirroring the email-provider fallback.
+- A server-only provider interface (`src/lib/ai/provider.ts`) connects to Groq's Chat
+  Completions API, defaulting to `openai/gpt-oss-120b`. Credentials stay on the server. Without
+  `GROQ_API_KEY`, the assistant shows its disconnected status and disables sending. Provider
+  failures preserve the draft and do not consume the workspace's monthly message allowance.
+  Tool loops are bounded, requests time out, and there is no automatic paid-provider fallback.
 - The model gets a fixed set of **approved analytics tools** (`getSalesSummary`,
   `getTopProducts`, `getLowStockVariants`, `getProfitSummary`, `comparePeriods`,
   `getBranchPerformance`, `getSlowMovingStock`, `getCustomerSummary`, `getReturnSummary`,
@@ -243,8 +244,9 @@ See `.env.example`:
 - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — optional; Google login only appears when both are set.
 - `RESEND_API_KEY` / `EMAIL_FROM` — optional; without a key, auth emails are logged to the server
   console instead of sent, so the flows stay testable without an email provider.
-- `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` — optional; without a key, the AI assistant chat still
-  works (conversations persist) but replies that it isn't connected yet.
+- `GROQ_API_KEY` — required to enable the AI assistant; use a Groq Free-plan account for
+  quota-limited free inference.
+- `GROQ_MODEL` — optional, defaults to `openai/gpt-oss-120b`.
 
 See `DEPLOYMENT.md` for the full production release checklist.
 
