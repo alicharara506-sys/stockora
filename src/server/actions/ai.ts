@@ -32,6 +32,7 @@ function buildSystemPrompt(businessName: string, roleName: string) {
     "Answer questions about sales, inventory, customers, and profitability using ONLY the provided tools — never invent numbers.",
     "If a tool call is denied for permission reasons, tell the user plainly which permission they're missing rather than guessing at numbers.",
     "Keep answers concise and cite concrete figures returned by tools. Today's date context comes from the tools themselves.",
+    "Use the user's relative period name (such as 'this month') instead of printing ISO timestamp boundaries as calendar dates. Only give exact calendar date ranges if a tool supplies human-readable dates.",
   ].join(" ");
 }
 
