@@ -170,7 +170,7 @@ uniqueness (e.g. a SKU unique per business, not globally) is enforced with compo
 - The model gets a fixed set of **approved analytics tools** (`getSalesSummary`,
   `getTopProducts`, `getLowStockVariants`, `getProfitSummary`, `comparePeriods`,
   `getBranchPerformance`, `getSlowMovingStock`, `getCustomerSummary`, `getReturnSummary`,
-  `getSuggestedReorders`) backed by parameterized Prisma queries — never arbitrary SQL
+  `getSuggestedReorders`, `getHighestStockProducts`) backed by parameterized Prisma queries — never arbitrary SQL
   (`src/lib/ai/tools.ts`).
 - Every tool call is scoped to the caller's resolved business/permission set and checks
   permissions before running (e.g. a Cashier without `view_profit` gets a permission-denied tool

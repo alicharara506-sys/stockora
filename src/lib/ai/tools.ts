@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveDateRange } from "@/lib/reports/date-range";
 import { getReportData } from "@/lib/reports/queries";
 import { PERMISSIONS, type PermissionKey } from "@/lib/permissions/constants";
+import { highestStockProducts } from "./inventory-summary";
 
 export interface ToolCallContext {
   businessId: string;
@@ -99,6 +100,34 @@ const getLowStockVariants = defineTool({
         reorderLevel: b.variant.reorderLevel,
       }));
     return { lowStock };
+  },
+});
+
+const getHighestStockProducts = defineTool({
+  name: "getHighestStockProducts",
+  description: "Products with the highest current inventory quantity on hand, summed across all sizes, colors and locations. Use for highest inventory, most stock, or largest stock questions. Optional branch filter.",
+  permission: PERMISSIONS.VIEW_REPORTS,
+  schema: z.object({
+    limit: z.number().int().min(1).max(20).default(5),
+    branchId: z.string().optional(),
+  }),
+  run: async (ctx, input) => {
+    const balances = await prisma.inventoryBalance.findMany({
+      where: {
+        businessId: ctx.businessId,
+        ...(input.branchId ? { location: { branchId: input.branchId } } : {}),
+      },
+      select: {
+        quantityOnHand: true,
+        quantityReserved: true,
+        variant: { select: { productId: true, product: { select: { name: true } } } },
+      },
+    });
+    return {
+      scope: input.branchId ? "selected branch" : "all locations",
+      rankedBy: "quantityOnHand",
+      products: highestStockProducts(balances, input.limit),
+    };
   },
 });
 
@@ -292,6 +321,7 @@ export const AI_TOOLS: ToolDefinition[] = [
   getSalesSummary,
   getTopProducts,
   getLowStockVariants,
+  getHighestStockProducts,
   getProfitSummary,
   comparePeriods,
   getBranchPerformance,

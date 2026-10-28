@@ -33,8 +33,15 @@ const SUGGESTIONS = [
   "How were sales this week compared to last week?",
   "What are my top 5 products by revenue this month?",
   "Which variants are low on stock right now?",
+  "Which products have the highest inventory?",
   "What's my gross profit this month?",
 ];
+
+function renderAssistantText(content: string) {
+  return content.split(/\*\*([^*]+)\*\*/g).map((part, index) =>
+    index % 2 === 1 ? <strong key={index}>{part}</strong> : part,
+  );
+}
 
 export function ChatClient({ aiConfigured, conversations, activeConversationId, messages, usage }: ChatClientProps) {
   const router = useRouter();
@@ -156,7 +163,7 @@ export function ChatClient({ aiConfigured, conversations, activeConversationId, 
                     isUser ? "bg-brand-black text-white" : "border border-brand-border bg-brand-surface text-brand-black"
                   }`}
                 >
-                  {message.content}
+                  {isUser ? message.content : renderAssistantText(message.content)}
                 </div>
               </div>
             );

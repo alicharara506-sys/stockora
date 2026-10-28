@@ -141,4 +141,36 @@ describe("Groq assistant", () => {
       return true;
     });
   });
+
+  test("recovers from a dropped connection before returning the live answer", async () => {
+    let attempts = 0;
+    const fetcher: typeof fetch = async () => {
+      attempts++;
+      if (attempts === 1) throw Object.assign(new TypeError("fetch failed"), { cause: { code: "ECONNRESET" } });
+      return answer("Your highest-stock product is Jeans.");
+    };
+    const result = await new GroqProvider("test-key", undefined, fetcher).runTurn(params);
+    assert.equal(result.text, "Your highest-stock product is Jeans.");
+    assert.equal(attempts, 2);
+  });
+
+  test("limits persistent DNS failures to three connection attempts", async () => {
+    let attempts = 0;
+    const fetcher: typeof fetch = async () => {
+      attempts++;
+      throw Object.assign(new TypeError("private network detail"), { cause: { code: "EAI_AGAIN" } });
+    };
+    await assert.rejects(new GroqProvider("test-key", undefined, fetcher).runTurn(params), /could not reach Groq/);
+    assert.equal(attempts, 3);
+  });
+
+  test("does not retry certificate failures", async () => {
+    let attempts = 0;
+    const fetcher: typeof fetch = async () => {
+      attempts++;
+      throw Object.assign(new TypeError("certificate rejected"), { cause: { code: "UNABLE_TO_VERIFY_LEAF_SIGNATURE" } });
+    };
+    await assert.rejects(new GroqProvider("test-key", undefined, fetcher).runTurn(params), /could not reach Groq/);
+    assert.equal(attempts, 1);
+  });
 });

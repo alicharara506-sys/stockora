@@ -1,9 +1,25 @@
 import { z } from "zod";
+import { setTimeout as delay } from "node:timers/promises";
 import type { AIProvider, AIToolCallLog, AITurnResult } from "./types";
 
 export const DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b";
 const MAX_TOOL_ITERATIONS = 5;
 const TURN_TIMEOUT_MS = 45_000;
+const MAX_CONNECTION_ATTEMPTS = 3;
+const CONNECTION_TIMEOUT_MS = 12_000;
+const RETRYABLE_NETWORK_CODES = new Set([
+  "ECONNRESET", "ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND", "EAI_AGAIN",
+  "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_SOCKET",
+]);
+
+function networkErrorCode(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null) return;
+  const cause = "cause" in error ? error.cause : undefined;
+  if (typeof cause === "object" && cause !== null && "code" in cause && typeof cause.code === "string") {
+    return cause.code;
+  }
+  return "code" in error && typeof error.code === "string" ? error.code : undefined;
+}
 
 const toolCallSchema = z.object({
   id: z.string().min(1),
@@ -47,32 +63,53 @@ export class GroqProvider implements AIProvider {
     private readonly fetcher: typeof fetch = fetch,
   ) {}
 
-  private async complete(messages: GroqMessage[], tools: unknown[], signal: AbortSignal) {
-    let response: Response;
-    try {
-      response = await this.fetcher("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        cache: "no-store",
-        signal,
-        body: JSON.stringify({
-          model: this.model,
-          messages,
-          ...(tools.length > 0 ? { tools, tool_choice: "auto" } : {}),
-          max_completion_tokens: 2048,
-          ...(this.model.startsWith("openai/gpt-oss-")
-            ? { reasoning_effort: "low", include_reasoning: false }
-            : {}),
-        }),
-      });
-    } catch {
-      throw new AIProviderError(signal.aborted
-        ? "The AI request took too long. Please try a shorter question."
-        : "Stockora could not reach Groq. Please try again shortly.");
+  private async request(body: string, signal: AbortSignal): Promise<Response> {
+    for (let attempt = 0; attempt < MAX_CONNECTION_ATTEMPTS; attempt++) {
+      const attemptSignal = AbortSignal.any([signal, AbortSignal.timeout(CONNECTION_TIMEOUT_MS)]);
+      try {
+        return await this.fetcher("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.apiKey}`,
+          },
+          cache: "no-store",
+          signal: attemptSignal,
+          body,
+        });
+      } catch (error) {
+        if (signal.aborted) {
+          throw new AIProviderError("The AI request took too long. Please try a shorter question.");
+        }
+        const code = networkErrorCode(error);
+        const retryable = attemptSignal.aborted || (code !== undefined && RETRYABLE_NETWORK_CODES.has(code));
+        console.warn("Groq connection attempt failed", {
+          attempt: attempt + 1,
+          code: code && RETRYABLE_NETWORK_CODES.has(code) ? code : attemptSignal.aborted ? "ATTEMPT_TIMEOUT" : "NETWORK_ERROR",
+        });
+        if (!retryable || attempt === MAX_CONNECTION_ATTEMPTS - 1) {
+          throw new AIProviderError("Stockora could not reach Groq. Check the server's internet connection and try again shortly.");
+        }
+        try {
+          await delay(200 * 2 ** attempt, undefined, { signal });
+        } catch {
+          throw new AIProviderError("The AI request took too long. Please try a shorter question.");
+        }
+      }
     }
+    throw new AIProviderError("Stockora could not reach Groq. Please try again shortly.");
+  }
+
+  private async complete(messages: GroqMessage[], tools: unknown[], signal: AbortSignal) {
+    const response = await this.request(JSON.stringify({
+      model: this.model,
+      messages,
+      ...(tools.length > 0 ? { tools, tool_choice: "auto" } : {}),
+      max_completion_tokens: 2048,
+      ...(this.model.startsWith("openai/gpt-oss-")
+        ? { reasoning_effort: "low", include_reasoning: false }
+        : {}),
+    }), signal);
 
     if (!response.ok) {
       if (response.status === 429) {

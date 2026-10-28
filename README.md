@@ -75,7 +75,8 @@ required; everything else (Google login, transactional email) degrades gracefull
    ```
 
 3. Restart the app, sign in, and open `/ai-assistant`. Start a new chat and ask
-   "Which variants are low on stock right now?" or "What were my sales this month?".
+   "Which products have the highest inventory?", "Which variants are low on stock right now?",
+   or "What were my sales this month?".
    The assistant uses the current business's permission-checked tools to fetch its answers.
 
 Keep the key server-side; a filled-in `.env` must never be committed. Groq is the only AI
@@ -85,6 +86,8 @@ want zero inference charges. Free quotas are shared across the Groq organization
 answer can require several API calls. See https://console.groq.com/docs/rate-limits for current
 limits. Rate-limit, connection, and authorization failures display an error, preserve the draft,
 and do not consume Stockora's monthly message allowance. Without a key, sending is disabled.
+Temporary DNS, socket, and connection-timeout failures are retried up to twice within the
+45-second request deadline. Authentication errors and free-plan rate limits are not retried.
 
 ## Scripts
 
