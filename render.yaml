@@ -1,0 +1,35 @@
+# Free testing deployment for stockora.olonagency.com.
+# DATABASE_URL must point to a separate hosted database, such as Neon Free.
+services:
+  - type: web
+    name: olon-stockora
+    runtime: node
+    plan: free
+    region: frankfurt
+    repo: https://github.com/alicharara506-sys/stockora
+    branch: claude/stockora-brand-components-7ureyx
+    buildCommand: npm ci --include=dev && npm run build -- --webpack
+    # Free instances do not support a pre-deploy command. Apply committed
+    # migrations before starting the single instance; a failure stops startup.
+    startCommand: npx prisma migrate deploy && npm run start -- --hostname 0.0.0.0
+    healthCheckPath: /login
+    autoDeployTrigger: commit
+    domains:
+      - stockora.olonagency.com
+    envVars:
+      - key: NODE_VERSION
+        value: "24.22.1"
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://stockora.olonagency.com
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b

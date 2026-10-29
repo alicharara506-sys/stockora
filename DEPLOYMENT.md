@@ -90,3 +90,36 @@ roles, and plans) — don't run it against a production database that already ha
 `next.config.ts` sets `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and a
 conservative `Permissions-Policy` on every response. If you put Stockora behind a CDN/WAF, confirm
 it doesn't strip these.
+
+## 7. OLON free testing deployment
+
+The repository's `render.yaml` configures a single free Render web service in Frankfurt for
+`https://stockora.olonagency.com`. Import the repository as a Render Blueprint, select the
+`claude/stockora-brand-components-7ureyx` branch, and keep the compute plan on Free.
+
+Create a separate Neon Free PostgreSQL project in the same region. Supply its connection string
+as `DATABASE_URL`, including the TLS parameters supplied by Neon, and supply `GROQ_API_KEY` through
+Render's secret environment variables. The Blueprint generates a new `AUTH_SECRET`; never copy
+the local `.env` into Git or reuse its local database URL.
+
+The build installs development dependencies for TypeScript and Prisma generation, then builds
+Next.js with Webpack. Free Render instances do not have a pre-deploy step, so the start command
+applies the committed migrations before starting the server. Next.js reads Render's `PORT`
+automatically. Do not run the demo seed on the public database: it creates a publicly documented
+demo password. Create your own account through the signup/onboarding flow instead.
+
+Once Render assigns the service its `onrender.com` hostname, add the custom domain in the service's
+Settings if it was not added by the Blueprint. In GoDaddy DNS for `olonagency.com`, add a CNAME
+with Name `stockora` and Value equal to that exact Render hostname (no `https://` or path).
+Verify the custom domain in Render and wait for its managed TLS certificate. Test the HTTPS
+login, onboarding, and an AI question on the final domain.
+
+This is a testing setup: Render Free can sleep after 15 minutes of inactivity, and Neon Free can
+suspend compute when idle or when its quotas are exhausted. Account limits can change; check the
+provider dashboards before upgrading. Signup verification and password-reset emails require
+`RESEND_API_KEY` and a verified `EMAIL_FROM` sender; without them, the existing app logs the
+links in the private server logs rather than delivering mail.
+
+Provider references: [Render Free](https://render.com/docs/free),
+[Render custom domains](https://render.com/docs/custom-domains), and
+[Neon plans](https://neon.com/docs/introduction/plans).
